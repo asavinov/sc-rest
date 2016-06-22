@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.conceptoriented</groupId>
+    <artifactId>sc-rest</artifactId>
+    <!-- <packaging>jar</packaging> -->
+    <version>0.1.0-SNAPSHOT</version>
+
+    <name>StreamCommandr Rest</name>
+    <url>http://conceptoriented.com</url>
+
+    <properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
+		<maven.compiler.testSource>1.8</maven.compiler.testSource>
+		<maven.compiler.testTarget>${maven.compiler.testSource}</maven.compiler.testTarget>
+
+        <java.version>1.8</java.version>
+        <guava.version>18.0</guava.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+			<!--
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<verbose>true</verbose>
+					<fork>true</fork>
+					<executable>${jdk}/bin/javac</executable>
+					<compilerVersion>1.5</compilerVersion>
+				</configuration>
+			</plugin>
+            -->
+			
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>1.2.7.RELEASE</version>
+            </plugin>
+            
+
+			<!-- For tests -->
+			<!--
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12.4</version>
+				<configuration>
+					<jvm>${jdk}/bin/java</jvm>
+					<forkMode>once</forkMode>
+				</configuration>
+			</plugin>
+			-->
+        </plugins>
+    </build>
+
+    <!-- 
+    <repositories>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </repository>
+    </repositories>
+    -->
+
+    <!-- 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/libs-release</url>
+        </pluginRepository>
+    </pluginRepositories>
+    -->
+
+	<!-- 
+	<parent>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-parent</artifactId>
+	    <version>1.2.7.RELEASE</version>
+	</parent>
+	 -->
+
+    <dependencies>
+        <!-- 
+	    <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter</artifactId>
+	        <version>1.2.7.RELEASE</version>
+	    </dependency>
+         -->
+	
+        <!-- 
+	    <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-web</artifactId>
+	        <version>1.2.7.RELEASE</version>
+	    </dependency>
+         -->
+
+        <!-- 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-rest</artifactId>
+			<version>1.2.7.RELEASE</version>
+        </dependency>
+         -->
+
+        <!-- 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+         -->
+
+        <!-- 
+	    <dependency>
+	        <groupId>org.springframework.boot</groupId>
+	        <artifactId>spring-boot-starter-test</artifactId>
+			<version>1.2.7.RELEASE</version>
+	        <scope>test</scope>
+	    </dependency>
+         -->
+	
+    </dependencies>
+
+</project>
