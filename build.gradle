@@ -13,7 +13,7 @@ apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
 
 jar {
-    baseName = 'sc-rest-service'
+    baseName = 'sc-rest'
     version =  '0.1.0'
 }
 

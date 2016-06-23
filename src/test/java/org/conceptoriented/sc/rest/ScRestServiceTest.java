@@ -52,6 +52,8 @@ public class ScRestServiceTest {
 		String result = template.getForObject(base.toString() + "ping", String.class);
 
 		assertEquals("StreamCommandr", result);
-	}
+
+		result = template.getForObject(base.toString() + "ping", String.class);
+}
 
 }
