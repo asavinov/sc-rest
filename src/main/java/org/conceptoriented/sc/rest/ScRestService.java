@@ -26,6 +26,12 @@ public class ScRestService {
 
 	private static final Logger LOG = Logger.getLogger(ScRestService.class.getName());
 
+	private final SpaceRepository repository;
+    @Autowired
+    public ScRestService(SpaceRepository repository) {
+        this.repository = repository;
+    }
+	
 	@RequestMapping(method = RequestMethod.GET, value = "/ping", produces = "text/plain")
 	public String ping(HttpServletRequest request /*HttpSession session*/) {
 		HttpSession session = request.getSession();
@@ -34,12 +40,14 @@ public class ScRestService {
 	}
 
 	@RequestMapping(value="/spaces")
-	public List<Space> spaces() {
+	public List<Some> spaces() {
 		
-		List<Space> list = new ArrayList<Space>();
-		list.add(new Space("Space 1", 25));
-		list.add(new Space("Space 2", 55));
-		list.add(new Space("Space 3", 45));
+		LOG.info("REPOSITORY: " + repository.name);
+		
+		List<Some> list = new ArrayList<Some>();
+		list.add(new Some("Space 1", 25));
+		list.add(new Some("Space 2", 55));
+		list.add(new Some("Space 3", 45));
 		
 		return list;
 	}
@@ -60,19 +68,19 @@ public class ScRestService {
 
 //@JsonDeserialize(using = RoleDeserializer.class)
 @JsonSerialize(using = SpaceSerializer.class)
-class Space {
+class Some {
 	public String name;
 	public double age;
 
-	public Space(String name, double age) {
+	public Some(String name, double age) {
 		this.name = name;
 		this.age = age;
 	}
 }
 
-class SpaceSerializer extends JsonSerializer<Space> {
+class SpaceSerializer extends JsonSerializer<Some> {
 	@Override
-	public void serialize(Space value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
+	public void serialize(Some value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
 
 	    gen.writeStartObject();
 

@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
+import org.conceptoriented.sc.core.*;
 
 /**
  * Spring Boot Root Context class.
@@ -18,6 +20,13 @@ import org.springframework.context.annotation.Configuration;
 public class Application {
 
 	public static void main(String[] args) {
+		
+		// We need to create global repository of all spaces created by users
+		// For each request, the controller finds the corresponding space and then performs the operation
+		// Resolving spaces on requests can be performed by using session ids
+		// Each created space has creation time and it will be deleted after some timeout (just because its session is supposed to be expired and deleted)
+		Space space = new Space("My Space");
+		
 		SpringApplication app = new SpringApplication(Application.class);
 		setProfile(app);
 		app.run(args);
@@ -41,4 +50,9 @@ public class Application {
 		System.out.println("ActiveProfile: " + activeProfile);
 		app.setAdditionalProfiles(activeProfile);
 	}
+}
+
+@Service
+class SpaceRepository  {
+	public String name = "My repository";
 }
