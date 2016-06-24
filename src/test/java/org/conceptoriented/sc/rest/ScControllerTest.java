@@ -45,7 +45,7 @@ public class ScControllerTest {
 
 		// Some examples: https://github.com/spring-projects/spring-test-mvc/blob/master/src/test/java/org/springframework/test/web/server/samples/standalone/resultmatchers/JsonPathAssertionTests.java
 		
-		MvcResult result = this.mockMvc.perform(get("/ping").session(mockSession))
+		MvcResult result = this.mockMvc.perform(get("/api/v1/ping").session(mockSession))
 				.andDo(print())
 				.andExpect(status().isOk())
 				//.andExpect(content().string("StreamCommandr"))

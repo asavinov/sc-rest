@@ -8,6 +8,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.conceptoriented.sc.core.*;
 
 /**
@@ -50,9 +54,4 @@ public class Application {
 		System.out.println("ActiveProfile: " + activeProfile);
 		app.setAdditionalProfiles(activeProfile);
 	}
-}
-
-@Service
-class SpaceRepository  {
-	public String name = "My repository";
 }

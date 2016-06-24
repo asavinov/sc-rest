@@ -49,7 +49,7 @@ public class ScRestServiceTest {
 	public void testRestExecute() throws Exception {
 		System.out.println(">>>>>>>>>>>>>>>>>>>>> testRestExecute");
 		
-		String result = template.getForObject(base.toString() + "ping", String.class);
+		String result = template.getForObject(base.toString() + "/api/v1/ping", String.class);
 
 		assertEquals("StreamCommandr", result);
 
