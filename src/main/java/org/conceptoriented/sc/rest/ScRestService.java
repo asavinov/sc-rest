@@ -3,12 +3,16 @@ package org.conceptoriented.sc.rest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +29,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.conceptoriented.sc.core.*;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api")
 public class ScRestService {
 
 	private static final Logger LOG = Logger.getLogger(ScRestService.class.getName());
@@ -44,32 +48,35 @@ public class ScRestService {
 	}
 
 	//
-	// Tables
+	// Spaces
 	//
 
+	@CrossOrigin(origins = "http://localhost:3000")
 	@RequestMapping(value = "/spaces", method = RequestMethod.GET)
-	public List<Some> spaces() {
-		
-		LOG.info("REPOSITORY: " + repository.name);
-		
-		List<Some> list = new ArrayList<Some>();
-		list.add(new Some("Space 1", 25));
-		list.add(new Some("Space 2", 55));
-		list.add(new Some("Space 3", 45));
-		
-		return list;
+	public String /* with List<Space> */ spaces() {
+		Space space = repository.spaces.get("sample");
+		// Currently one space for user/seesion
+		String jelem = space.toJson();
+		return "{\"data\": [" + jelem + "]}";
 	}
 
 	//
 	// Tables
 	//
 
-	// Many tables
+	// Many tables (primitive tables included)
 	
+	@CrossOrigin(origins = "http://localhost:3000")
 	@RequestMapping(value = "/tables", method = RequestMethod.GET, produces = "application/json")
-	public List<Table> getTables(HttpSession session) { // Return all tables in the space
+	public String /* with List<Table> */ getTables(HttpSession session) { // Return all tables in the space
 		Space space = repository.spaces.get("sample");
-		return null;
+		String jelems = "";
+		for(Table elem : space.getTables()) {
+			String jelem = elem.toJson();
+			jelems += jelem + ", ";
+		}
+		jelems = jelems.substring(0, jelems.length()-2);
+		return "{\"data\": [" + jelems + "]}";
 	}
 	@RequestMapping(value = "/tables", method = RequestMethod.POST, produces = "application/json")
 	public List<Table> createTables() { // Create several tables
@@ -90,22 +97,28 @@ public class ScRestService {
 	// One table
 
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.GET, produces = "application/json")
-	public List<Table> getTable(@PathVariable String id) { // Return one table with the specified id
+	public Table getTable(@PathVariable String id) { // Return one table with the specified id
 		Space space = repository.spaces.get("sample");
-		return null;
+        Optional<Table> ret = space.getTables().stream().filter(x -> x.getId().toString().equals(id)).findAny();
+        if(ret.isPresent()) {
+        	return ret.get();
+        }
+        else {
+    		return null;
+        }
 	}
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.POST, produces = "application/json")
-	public List<Table> createTable() { // Not allowed to create an object with a given id (id has to be allocated by the service)
+	public Table createTable() { // Not allowed to create an object with a given id (id has to be allocated by the service)
 		Space space = repository.spaces.get("sample");
 		return null;
 	}
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.DELETE, produces = "application/json")
-	public List<Table> deleteTable(@PathVariable String id) { // Delete the specified table (and its columns)
+	public Table deleteTable(@PathVariable String id) { // Delete the specified table (and its columns)
 		Space space = repository.spaces.get("sample");
 		return null;
 	}
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.PUT, produces = "application/json")
-	public List<Table> updateTable(@PathVariable String id) { // Update an existing table
+	public Table updateTable(@PathVariable String id) { // Update an existing table
 		Space space = repository.spaces.get("sample");
 		return null;
 	}
@@ -113,6 +126,22 @@ public class ScRestService {
 	//
 	// Columns
 	//
+	
+	// Many columns
+
+	@CrossOrigin(origins = "http://localhost:3000")
+	@RequestMapping(value = "/columns", method = RequestMethod.GET, produces = "application/json")
+	public String /* with List<Column> */ getColumns(HttpSession session) { // Return all columns in the space
+		Space space = repository.spaces.get("sample");
+		String jelems = "";
+		for(Column elem : space.getColumns()) {
+			String jelem = elem.toJson();
+			jelems += jelem + ", ";
+		}
+		jelems = jelems.substring(0, jelems.length()-2);
+		return "{\"data\": [" + jelems + "]}";
+	}
+	
 
 }
 
@@ -159,11 +188,11 @@ get /api/v1/analytic/execution/async/{requestId}/status - Get the analytic execu
 
 
 Use standard HTTP status codes:
-200 – OK – Eyerything is working
-201 – OK – New resource has been created
-204 – OK – The resource was successfully deleted
+200 ï¿½ OK ï¿½ Eyerything is working
+201 ï¿½ OK ï¿½ New resource has been created
+204 ï¿½ OK ï¿½ The resource was successfully deleted
 
-404 – Not found – There is no resource behind the URI.
+404 ï¿½ Not found ï¿½ There is no resource behind the URI.
 
 Exceptions as error payload
 

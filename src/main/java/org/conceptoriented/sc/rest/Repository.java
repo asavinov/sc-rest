@@ -21,8 +21,8 @@ public class Repository  {
 		space.createColumn("Column 12", "Table 1", "String");
 		
 		space.createTable("Table 2");
-		space.createColumn("Column 21", "Table 1", "Double");
-		space.createColumn("Column 22", "Table 1", "String");
+		space.createColumn("Column 21", "Table 2", "Integer");
+		space.createColumn("Column 22", "Table 2", "String");
 
 		return space;
 	}
