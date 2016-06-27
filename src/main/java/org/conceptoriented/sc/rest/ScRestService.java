@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +32,8 @@ import org.conceptoriented.sc.core.*;
 @RestController
 @RequestMapping("/api")
 public class ScRestService {
+	
+	private static final String crossOrigins = "http://localhost:3000";
 
 	private static final Logger LOG = Logger.getLogger(ScRestService.class.getName());
 
@@ -51,7 +54,7 @@ public class ScRestService {
 	// Spaces
 	//
 
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/spaces", method = RequestMethod.GET)
 	public String /* with List<Space> */ spaces() {
 		Space space = repository.spaces.get("sample");
@@ -66,7 +69,7 @@ public class ScRestService {
 
 	// Many tables (primitive tables included)
 	
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables", method = RequestMethod.GET, produces = "application/json")
 	public String /* with List<Table> */ getTables(HttpSession session) { // Return all tables in the space
 		Space space = repository.spaces.get("sample");
@@ -129,7 +132,7 @@ public class ScRestService {
 	
 	// Many columns
 
-	@CrossOrigin(origins = "http://localhost:3000")
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns", method = RequestMethod.GET, produces = "application/json")
 	public String /* with List<Column> */ getColumns(HttpSession session) { // Return all columns in the space
 		Space space = repository.spaces.get("sample");
@@ -142,6 +145,49 @@ public class ScRestService {
 		return "{\"data\": [" + jelems + "]}";
 	}
 	
+	// One column
+
+	@RequestMapping(value = "/columns/{id}", method = RequestMethod.GET, produces = "application/json")
+	public Column getColumn(@PathVariable String id) { // Return one column with the specified id
+		Space space = repository.spaces.get("sample");
+        Optional<Column> ret = space.getColumns().stream().filter(x -> x.getId().toString().equals(id)).findAny();
+        if(ret.isPresent()) {
+        	return ret.get();
+        }
+        else {
+    		return null;
+        }
+	}
+	@RequestMapping(value = "/columns/{id}", method = RequestMethod.POST, produces = "application/json")
+	public Column createColumn() { // Not allowed to create an object with a given id (id has to be allocated by the service)
+		Space space = repository.spaces.get("sample");
+		return null;
+	}
+	@RequestMapping(value = "/columns/{id}", method = RequestMethod.DELETE, produces = "application/json")
+	public Column deleteColumn(@PathVariable String id) { // Delete the specified table (and its columns)
+		Space space = repository.spaces.get("sample");
+		return null;
+	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/columns/{id}", method = RequestMethod.PUT, produces = "application/json")
+	public String /* of Column */ updateColumn(@PathVariable String id, @RequestBody String columnJson) { // Update an existing column
+		Space space = repository.spaces.get("sample");
+		
+		// De-serialize json string into column object
+		//Column newCol = Column.fromJson();
+		
+		
+        Optional<Column> ret = space.getColumns().stream().filter(x -> x.getId().toString().equals(id)).findAny();
+        if(ret.isPresent()) {
+        	Column col = ret.get();
+
+        	col.setName("NEW NAME");
+        	return col.toJson();
+        }
+        else {
+    		return null; // ERROR: Not found
+        }
+	}
 
 }
 
