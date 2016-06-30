@@ -99,31 +99,33 @@ public class ScRestService {
 
 	// One table
 
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.GET, produces = "application/json")
-	public Table getTable(@PathVariable String id) { // Return one table with the specified id
+	public String /* of Table */ getTable(@PathVariable String id) { // Return one table with the specified id
 		Space space = repository.spaces.get("sample");
-        Optional<Table> ret = space.getTables().stream().filter(x -> x.getId().toString().equals(id)).findAny();
-        if(ret.isPresent()) {
-        	return ret.get();
-        }
-        else {
-    		return null;
-        }
+		Table table = space.getTableById(id);
+		return table.toJson();
 	}
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.POST, produces = "application/json")
-	public Table createTable() { // Not allowed to create an object with a given id (id has to be allocated by the service)
+	public String /* of Table */ createTable(@RequestBody String body) { // Not allowed to create an object with a given id (id has to be allocated by the service)
 		Space space = repository.spaces.get("sample");
-		return null;
+		Table table = space.createTableFromJson(body);
+		return table.toJson();
 	}
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.DELETE, produces = "application/json")
-	public Table deleteTable(@PathVariable String id) { // Delete the specified table (and its columns)
+	public void deleteTable(@PathVariable String id) { // Delete the specified table (and its columns)
 		Space space = repository.spaces.get("sample");
-		return null;
+		space.deleteTable(id);
 	}
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.PUT, produces = "application/json")
-	public Table updateTable(@PathVariable String id) { // Update an existing table
+	public String /* of Table */ updateTable(@PathVariable String id, @RequestBody String body) { // Update an existing table
 		Space space = repository.spaces.get("sample");
-		return null;
+		space.updateTableFromJson(body);
+		Table table = space.getTableById(id);
+		return table.toJson();
 	}
 
 	//
@@ -147,46 +149,33 @@ public class ScRestService {
 	
 	// One column
 
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.GET, produces = "application/json")
-	public Column getColumn(@PathVariable String id) { // Return one column with the specified id
+	public String /* of Column */ getColumn(@PathVariable String id) { // Return one column with the specified id
 		Space space = repository.spaces.get("sample");
-        Optional<Column> ret = space.getColumns().stream().filter(x -> x.getId().toString().equals(id)).findAny();
-        if(ret.isPresent()) {
-        	return ret.get();
-        }
-        else {
-    		return null;
-        }
+		Column column = space.getColumnById(id);
+		return column.toJson();
 	}
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.POST, produces = "application/json")
-	public Column createColumn() { // Not allowed to create an object with a given id (id has to be allocated by the service)
+	public String /* of Column */ createColumn(@RequestBody String body) { // Not allowed to create an object with a given id (id has to be allocated by the service)
 		Space space = repository.spaces.get("sample");
-		return null;
+		Column column = space.createColumnFromJson(body);
+		return column.toJson();
 	}
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.DELETE, produces = "application/json")
-	public Column deleteColumn(@PathVariable String id) { // Delete the specified table (and its columns)
+	public void deleteColumn(@PathVariable String id) { // Delete the specified table (and its columns)
 		Space space = repository.spaces.get("sample");
-		return null;
+		space.deleteColumn(id);
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.PUT, produces = "application/json")
-	public String /* of Column */ updateColumn(@PathVariable String id, @RequestBody String columnJson) { // Update an existing column
+	public String /* of Column */ updateColumn(@PathVariable String id, @RequestBody String body) { // Update an existing column
 		Space space = repository.spaces.get("sample");
-		
-		// De-serialize json string into column object
-		//Column newCol = Column.fromJson();
-		
-		
-        Optional<Column> ret = space.getColumns().stream().filter(x -> x.getId().toString().equals(id)).findAny();
-        if(ret.isPresent()) {
-        	Column col = ret.get();
-
-        	col.setName("NEW NAME");
-        	return col.toJson();
-        }
-        else {
-    		return null; // ERROR: Not found
-        }
+		space.updateColumnFromJson(body);
+		Column column = space.getColumnById(id);
+		return column.toJson();
 	}
 
 }
