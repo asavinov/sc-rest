@@ -146,6 +146,13 @@ public class ScRestService {
 		jelems = jelems.substring(0, jelems.length()-2);
 		return "{\"data\": [" + jelems + "]}";
 	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/columns", method = RequestMethod.POST, produces = "application/json")
+	public String /* of List<Column> */ createColumns(HttpSession session, @RequestBody String body) { // Create several columns
+		Space space = repository.spaces.get("sample");
+		Column column = space.createColumnFromJson(body);
+		return column.toJson();
+	}
 	
 	// One column
 
@@ -158,7 +165,7 @@ public class ScRestService {
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.POST, produces = "application/json")
-	public String /* of Column */ createColumn(@RequestBody String body) { // Not allowed to create an object with a given id (id has to be allocated by the service)
+	public String /* of Column */ createColumn(HttpSession session, @RequestBody String body) { // Not allowed to create an object with a given id (id has to be allocated by the service)
 		Space space = repository.spaces.get("sample");
 		Column column = space.createColumnFromJson(body);
 		return column.toJson();
