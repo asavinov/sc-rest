@@ -1,6 +1,8 @@
 package org.conceptoriented.sc.rest;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -76,10 +80,20 @@ public class ScRestService {
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/assets", method = RequestMethod.POST, produces = "application/json") // Create several assets
-	public String /* of List<Asset> */ createAssets(HttpSession session, @RequestBody String body) { 
+	public String /* of List<Asset> */ createAssets(HttpSession session, @RequestParam("file") MultipartFile file) { 
 		Space space = repository.spaces.get("sample");
-		Column column = space.createColumnFromJson(body);
-		return column.toJson();
+		
+		if(file.isEmpty()) {
+			return "{   }"; // Error file is empty file.getOriginalFilename()
+		}
+
+		try {
+			Files.copy(file.getInputStream(), Paths.get("C:/TEMP/classes", file.getOriginalFilename()));
+		} catch (IOException|RuntimeException e) {
+			; // e.getMessage()
+		}
+
+		return "{}";
 	}
 	
 	// One asset
