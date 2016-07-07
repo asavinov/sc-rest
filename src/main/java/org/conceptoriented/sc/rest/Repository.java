@@ -47,10 +47,10 @@ public class Repository  {
 	}
 	
 	public Repository() {
-		spaces.put("sample", createSampleSpace());
-
 		udfDir = "C:/temp/classes/"; // It is common for all space but can contain subfolders for individual spaces
 		classDir = new File(udfDir);
+
+		spaces.put("sample", createSampleSpace());
 	}
 
 }

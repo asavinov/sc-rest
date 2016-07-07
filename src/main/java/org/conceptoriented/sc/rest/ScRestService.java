@@ -55,12 +55,42 @@ public class ScRestService {
 	}
 
 	//
+	// Assets. They have description (like name/id and type) and contents (file itself)
+	//
+
+	// Many assets
+
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/assets", method = RequestMethod.GET, produces = "application/json") // Read all assets
+	public String /* with List<Asset> */ getAssets(HttpSession session) { 
+		Space space = repository.spaces.get("sample");
+		String jelems = "";
+		for(Column elem : space.getColumns()) {
+			String jelem = elem.toJson();
+			jelems += jelem + ", ";
+		}
+		if(jelems.length() > 2) {
+			jelems = jelems.substring(0, jelems.length()-2);
+		}
+		return "{\"data\": [" + jelems + "]}";
+	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/assets", method = RequestMethod.POST, produces = "application/json") // Create several assets
+	public String /* of List<Asset> */ createAssets(HttpSession session, @RequestBody String body) { 
+		Space space = repository.spaces.get("sample");
+		Column column = space.createColumnFromJson(body);
+		return column.toJson();
+	}
+	
+	// One asset
+
+	//
 	// Spaces
 	//
 
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/spaces", method = RequestMethod.GET)
-	public String /* with List<Space> */ spaces() {
+	public String /* with List<Space> */ getSpaces() {
 		Space space = repository.spaces.get("sample");
 		// Currently one space for user/seesion
 		String jelem = space.toJson();
