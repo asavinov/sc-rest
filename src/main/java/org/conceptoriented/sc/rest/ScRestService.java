@@ -59,30 +59,48 @@ public class ScRestService {
 	}
 
 	//
-	// Spaces
+	// Spaces and their elements
 	//
 
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/spaces", method = RequestMethod.GET) // All spaces (of an account)
-	public String /* with List<Space> */ getSpaces() {
+	@RequestMapping(value = "/spaces", method = RequestMethod.GET) // Get all spaces (of an account)
+	public String /* with List<Space> */ getSpaces(HttpSession session) {
 		Space space = repository.getSpaceForName("sample");
 		// Currently one space for user/seesion
 		String jelem = space.toJson();
 		return "{\"data\": [" + jelem + "]}";
 	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/spaces", method = RequestMethod.POST, produces = "application/json") // Create one (or several) several spaces
+	public String /* of List<Space> */ createSpaces(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+		Space space = repository.getSpaceForName("sample");
+		return space.toJson();
+	}
 	
-	// TODO: Get one space with id
-
-
-	// Tables of one space
-	
-	// TODO: tables of one space (so that we can request them later independent of the space)
-	// REWORK so that it works only in the context of one space (identified by id in url)
-	// See records of one table
 
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/tables", method = RequestMethod.GET, produces = "application/json") // Read all tables in the space
-	public String /* with List<Table> */ getTables(HttpSession session) { 
+	@RequestMapping(value = "/spaces/{id}", method = RequestMethod.GET, produces = "application/json") // Get one space with the specified id
+	public String /* of Space */ getSpace(HttpSession session, @PathVariable String id) { 
+		Space space = repository.getSpaceForName("sample");
+		return space.toJson();
+	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/spaces/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing space
+	public String /* of Space */ updateSpace(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+		Space space = repository.getSpaceForName("sample");
+		return space.toJson();
+	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/spaces/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified space (and all its elements)
+	public void deleteSpace(HttpSession session, @PathVariable String id) { 
+		Space space = repository.getSpaceForName("sample");
+	}
+	
+	// Tables of one space
+	
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/spaces/{id}/tables", method = RequestMethod.GET, produces = "application/json") // Read all tables in the space
+	public String /* of List<Table> */ getTables(HttpSession session, @PathVariable String id) {
 		Space space = repository.getSpaceForName("sample");
 		String jelems = "";
 		for(Table elem : space.getTables()) {
@@ -94,31 +112,18 @@ public class ScRestService {
 		}
 		return "{\"data\": [" + jelems + "]}";
 	}
-	@RequestMapping(value = "/tables", method = RequestMethod.POST, produces = "application/json") // Create one (or several) tables. Return 201 Status Code and (optionally) the newly created id.
-	public List<Table> createTables() { 
+	@RequestMapping(value = "/spaces/{id}/tables", method = RequestMethod.POST, produces = "application/json") // Create one (or several) tables. Return 201 Status Code and (optionally) the newly created id.
+	public List<Table> createTables(HttpSession session, @PathVariable String id) {
 		Space space = repository.getSpaceForName("sample");
+		// Space is also extracted from the table
 		return null;
 	}
-	@RequestMapping(value = "/tables", method = RequestMethod.DELETE, produces = "application/json") // Delete all tables (and their columns excluding primitive tables)
-	public List<Table> deleteTables() { 
-		Space space = repository.getSpaceForName("sample");
-		return null;
-	}
-	@RequestMapping(value = "/tables", method = RequestMethod.PUT, produces = "application/json") // Update several tables (bulk update)
-	public List<Table> updateTables() { 
-		Space space = repository.getSpaceForName("sample");
-		return null;
-	}
-
 	
 	// Columns of one space 
 
-	// TODO: columns of one space (so that we can request them later independent of the space)
-	// REWORK similar to tables in the context one space
-
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/columns", method = RequestMethod.GET, produces = "application/json") // Read all columns in the space
-	public String /* with List<Column> */ getColumns(HttpSession session) { 
+	@RequestMapping(value = "/spaces/{id}/columns", method = RequestMethod.GET, produces = "application/json") // Read all columns in the space
+	public String /* with List<Column> */ getColumns(HttpSession session, @PathVariable String id) {
 		Space space = repository.getSpaceForName("sample");
 		String jelems = "";
 		for(Column elem : space.getColumns()) {
@@ -131,8 +136,8 @@ public class ScRestService {
 		return "{\"data\": [" + jelems + "]}";
 	}
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/columns", method = RequestMethod.POST, produces = "application/json") // Create several columns
-	public String /* of List<Column> */ createColumns(HttpSession session, @RequestBody String body) { 
+	@RequestMapping(value = "/spaces/{id}/columns", method = RequestMethod.POST, produces = "application/json") // Create one (or several) several columns
+	public String /* of List<Column> */ createColumns(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Space space = repository.getSpaceForName("sample");
 		Column column = space.createColumnFromJson(body);
 		return column.toJson();
@@ -144,38 +149,31 @@ public class ScRestService {
 
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.GET, produces = "application/json") // Read one table with the specified id
-	public String /* of Table */ getTable(@PathVariable String id) { 
+	public String /* of Table */ getTable(HttpSession session, @PathVariable String id) { 
 		Space space = repository.getSpaceForName("sample");
 		Table table = space.getTableById(id);
 		return table.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/tables/{id}", method = RequestMethod.POST, produces = "application/json") // Create. Not allowed to create an object with a given id (id has to be allocated by the service)
-	public String /* of Table */ createTable(@RequestBody String body) {
-		Space space = repository.getSpaceForName("sample");
-		Table table = space.createTableFromJson(body);
-		return table.toJson();
-	}
-	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/tables/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
-	public void deleteTable(@PathVariable String id) { 
-		Space space = repository.getSpaceForName("sample");
-		space.deleteTable(id);
-	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing table
-	public String /* of Table */ updateTable(@PathVariable String id, @RequestBody String body) { 
+	public String /* of Table */ updateTable(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Space space = repository.getSpaceForName("sample");
 		space.updateTableFromJson(body);
 		Table table = space.getTableById(id);
 		return table.toJson();
+	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/tables/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
+	public void deleteTable(HttpSession session, @PathVariable String id) { 
+		Space space = repository.getSpaceForName("sample");
+		space.deleteTable(id);
 	}
 
 	// Records from one table
 
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.GET, produces = "application/json") // Read records from one table with the specified id
-	public String /* of List<Records> */ getRecords(@PathVariable String id) { 
+	public String /* of List<Records> */ getRecords(HttpSession session, @PathVariable String id) { 
 		Space space = repository.getSpaceForName("sample");
 		Table table = space.getTableById(id);
 		Range range = null; // All records
@@ -192,7 +190,7 @@ public class ScRestService {
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.POST, produces = "application/json") // Create records in a table with a given id
-	public String /* of List<Records> */ createRecords(@RequestBody String body, @PathVariable String id) {
+	public String /* of List<Records> */ createRecords(HttpSession session, @RequestBody String body, @PathVariable String id) {
 		Space space = repository.getSpaceForName("sample");
 		Table table = space.getTableById(id);
 
@@ -209,31 +207,24 @@ public class ScRestService {
 	
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.GET, produces = "application/json") // Read one column with the specified id
-	public String /* of Column */ getColumn(@PathVariable String id) { 
+	public String /* of Column */ getColumn(HttpSession session, @PathVariable String id) { 
 		Space space = repository.getSpaceForName("sample");
 		Column column = space.getColumnById(id);
 		return column.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/columns/{id}", method = RequestMethod.POST, produces = "application/json") // Create. Not allowed to create an object with a given id (id has to be allocated by the service)
-	public String /* of Column */ createColumn(HttpSession session, @RequestBody String body) { 
-		Space space = repository.getSpaceForName("sample");
-		Column column = space.createColumnFromJson(body);
-		return column.toJson();
-	}
-	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/columns/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
-	public void deleteColumn(@PathVariable String id) { 
-		Space space = repository.getSpaceForName("sample");
-		space.deleteColumn(id);
-	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing column
-	public String /* of Column */ updateColumn(@PathVariable String id, @RequestBody String body) { 
+	public String /* of Column */ updateColumn(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Space space = repository.getSpaceForName("sample");
 		space.updateColumnFromJson(body);
 		Column column = space.getColumnById(id);
 		return column.toJson();
+	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/columns/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
+	public void deleteColumn(HttpSession session, @PathVariable String id) { 
+		Space space = repository.getSpaceForName("sample");
+		space.deleteColumn(id);
 	}
 
 	//
