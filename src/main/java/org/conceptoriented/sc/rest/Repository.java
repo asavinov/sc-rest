@@ -10,13 +10,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.conceptoriented.sc.core.*;
 
 @Service
 public class Repository  {
-	public String name = "My repository";
 
 	// It is where we store various assets including UDFs
 	protected String udfDir; 
@@ -27,29 +28,104 @@ public class Repository  {
 	//
 	protected List<Account> accounts = new ArrayList<Account>();
 
+	public Account getAccount(UUID id) {
+		Optional<Account> ret = accounts
+				.stream()
+				.filter(acc -> acc.getId().equals(id))
+				.findAny();
+        if(ret.isPresent()) return ret.get();
+        else return null;
+	}
 	public Account getAccountForName(String name) { // An account must have unique name
-		return null;
+		Optional<Account> ret = accounts
+				.stream()
+				.filter(x -> x.getName().equals(name))
+				.findAny();
+        if(ret.isPresent()) return ret.get();
+        else return null;
 	}
 	public Account getAccountForSession(UUID id) { // One session per account
 		return null;
+	}
+	public Account addAccount(Account account) {
+		accounts.add(account);
+		return account;
 	}
 
 	//
 	// All existing spaces belonging to different users
 	//
-	protected Map<String, Space> spaces = new HashMap<String, Space>();
+	protected Map<Space, Account> spaces = new HashMap<Space, Account>();
 
-	public Space getSpaceForName(String name) {
-		return spaces.get(name);
+	public Space getSpace(UUID id) {
+		Optional<Space> ret = spaces.keySet()
+				.stream()
+				.filter(key -> key.getId().equals(id))
+				.findAny();
+        if(ret.isPresent()) return ret.get();
+        else return null;
+	}
+	public Space getSpaceForName(UUID id, String name) {
+		Optional<Space> ret = getSpacesForAccount(id)
+				.stream()
+				.filter(x -> x.getName().equals(name))
+				.findAny();
+        if(ret.isPresent()) return ret.get();
+        else return null;
+	}
+	public List<Space> getSpacesForAccount(UUID id) {
+		List<Space> ret = spaces.entrySet()
+				.stream()
+				.filter(entry -> entry.getValue().getId().equals(id))
+				.map(Map.Entry::getKey)
+				.collect(Collectors.<Space>toList());
+		return ret;
+	}
+	public Space addSpace(Account account, Space space) {
+		spaces.put(space, account);
+		return space;
+	}
+
+	public Table getTable(UUID accId, UUID id) {
+		for(Space space : getSpacesForAccount(accId)) {
+			Table table = space.getTableById(id.toString());
+			if(table != null) return table;
+		}
+		return null;
+	}
+
+	public Column getColumn(UUID accId, UUID id) {
+		for(Space space : getSpacesForAccount(accId)) {
+			Column column = space.getColumnById(id.toString());
+			if(column != null) return column;
+		}
+		return null;
 	}
 
 	//
 	// All existing assets belonging to different users
 	//
-	protected List<Asset> assets = new ArrayList<Asset>();
+	protected Map<Asset, Account> assets = new HashMap<Asset, Account>();
 
+	public Asset getAsset(UUID id) {
+		Optional<Asset> ret = assets.keySet()
+				.stream()
+				.filter(key -> key.getId().equals(id))
+				.findAny();
+        if(ret.isPresent()) return ret.get();
+        else return null;
+	}
 	public List<Asset> getAssetsForAccount(UUID id) {
-		return null;
+		List<Asset> ret = assets.entrySet()
+				.stream()
+				.filter(entry -> entry.getValue().getId().equals(id))
+				.map(Map.Entry::getKey)
+				.collect(Collectors.<Asset>toList());
+		return ret;
+	}
+	public Asset addAsset(Account account, Asset asset) {
+		assets.put(asset, account);
+		return asset;
 	}
 
 	public Repository() {
@@ -79,7 +155,7 @@ public class Repository  {
 		// Space
 		Space space = new Space("My Space");
 		space.setClassLoader(account.getClassLoader()); // Space will use its account loader which knows how to load from assets
-		spaces.put("sample", space);
+		this.addSpace(account, space);
 		
 		// Schema
 		Table t1 = space.createTable("Table 1");
@@ -129,6 +205,10 @@ class Account {
 	}
 	
 	public Account() {
+		this("");
+	}
+
+	public Account(String name) {
 		this.id = UUID.randomUUID();
 		
 		// Instantiate an account-specific class loader
