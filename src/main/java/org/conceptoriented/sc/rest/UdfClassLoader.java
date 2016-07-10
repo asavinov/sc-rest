@@ -1,5 +1,6 @@
 package org.conceptoriented.sc.rest;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +9,10 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 /**
  * Criteria:
@@ -33,16 +37,27 @@ import java.util.Map;
 // http://tutorials.jenkov.com/java-reflection/dynamic-class-loading-reloading.html - reading class from file
 public class UdfClassLoader extends ClassLoader {
 	
+	/*
+	try {
+		Files.copy(file.getInputStream(), Paths.get("C:/TEMP/classes", file.getOriginalFilename()));
+	} catch (IOException|RuntimeException e) {
+		; // e.getMessage()
+	}
+	*/
+
+	
 	String classesDir = "";
+
+	Account account;
 	
 	Map<String, Class> classes = new HashMap<String, Class>(); // Local cache of classes. It will be used for recursive calls.
 
-    public UdfClassLoader(String classesDir) {
-        this.classesDir = classesDir;
+    public UdfClassLoader(Account account) {
+        this.account = account;
     }
 
 	@Override
-	public synchronized Class loadClass(String className, boolean resolveIt) throws ClassNotFoundException {
+	public synchronized Class loadClass(String className, boolean resolve) throws ClassNotFoundException {
 		
 		Class clazz;
 
@@ -68,18 +83,38 @@ public class UdfClassLoader extends ClassLoader {
 			; // No system class with such a name
 		}
 		
-		// Should we call this method???
+		// Do we actually need this call???
+		/*
 		try {
 			clazz = super.loadClass(className);
 			return clazz;
 		} catch (ClassNotFoundException e) {
 			;
 		}
+		*/
 
 		//
 		// Try to load from our repository
 		//
 
+        try {
+        	// Find bytes for the class name
+            InputStream in = getResourceAsStream(className.replace('.', '/') + ".class");
+            //ByteArrayOutputStream out = new ByteArrayOutputStream();
+            //StreamUtils.writeTo(in, out);
+            //byte[] classData = out.toByteArray();
+            byte[] classData = org.springframework.util.StreamUtils.copyToByteArray(in);
+
+            // Use bytes to create a class
+            clazz = defineClass(className, classData, 0, classData.length);
+            if (resolve) {
+                resolveClass(clazz);
+            }
+        } catch (Exception e) {
+            clazz = super.loadClass(className, resolve);
+        }
+		
+		/*
 		byte classData[];
 		classData = loadClassDataFromFile(className); 
 		if (classData == null) { 
@@ -88,9 +123,10 @@ public class UdfClassLoader extends ClassLoader {
 		
 		clazz = defineClass(className, classData, 0, classData.length); 
 
-		if (resolveIt) { 
+		if (resolve) { 
 		    resolveClass(clazz); 
 		} 
+		*/
 		
 		// Store the class reference
 		classes.put(className, clazz); 
@@ -98,6 +134,34 @@ public class UdfClassLoader extends ClassLoader {
 		return clazz; 
 	}
 	
+
+	@Override
+	public URL getResource(String name) {
+	    return null;
+	}
+
+	// http://stackoverflow.com/questions/16602668/creating-a-classloader-to-load-a-jar-file-from-a-byte-array
+	@Override
+	public InputStream getResourceAsStream(String name) {
+
+		List<Asset> assets = account.getAssets(".jar");
+		if(assets.size() == 0) return null;
+
+		byte[] jarBytes = assets.get(0).getData();
+
+		try (JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jarBytes))) {
+	        JarEntry entry;
+	        while ((entry = jis.getNextJarEntry()) != null) {
+	            if (entry.getName().equals(name)) {
+	                return jis;
+	            }
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+
 	protected byte[] loadClassDataFromFile(String name) {
 
 		/*

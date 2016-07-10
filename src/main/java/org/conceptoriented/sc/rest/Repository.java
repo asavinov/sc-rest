@@ -137,8 +137,7 @@ public class Repository  {
 		//
 
 		// Account
-		Account account = new Account();
-		account.setName("test@host.com");
+		Account account = new Account(this, "test@host.com");
 		accounts.add(account);
 
 		URL[] classUrl = new URL[1];
@@ -194,7 +193,7 @@ class Account {
 		this.name = name;
 	}
 	
-	// This class loader knows how to get classes/instances from the assets of this account. 
+	// This class loader knows how to get evaluator classes/instances from the assets of this account. 
 	// It is injected into each space of this user so that custom columns can be evaluated.
 	private ClassLoader classLoader; 
 	public ClassLoader getClassLoader() {
@@ -204,15 +203,24 @@ class Account {
 		this.classLoader = classLoader;
 	}
 	
-	public Account() {
-		this("");
+	private Repository repository;
+
+	public List<Asset> getAssets(String extension) {
+		return repository.getAssetsForAccount(this.getId());
+	}
+	
+	public Account(Repository repository) {
+		this(repository, "");
 	}
 
-	public Account(String name) {
+	public Account(Repository repository, String name) {
 		this.id = UUID.randomUUID();
 		
+		this.repository = repository;
+		
 		// Instantiate an account-specific class loader
-		classLoader = ClassLoader.getSystemClassLoader();
+		//classLoader = ClassLoader.getSystemClassLoader();
+		classLoader = new UdfClassLoader(this);
 	}
 
 }
@@ -240,6 +248,15 @@ class Asset {
 	}
 	public void setAccount(Account account) {
 		this.account = account;
+	}
+	
+	// Asset content
+	private byte[] data;
+	public byte[] getData() {
+		return data;
+	}
+	public void setData(byte[] data) {
+		this.data = data;
 	}
 	
 	 public Asset() {

@@ -285,11 +285,27 @@ public class ScRestService {
 			return "{   }"; // Error file is empty file.getOriginalFilename()
 		}
 
+		byte[] data = new byte[(int)file.getSize()];
 		try {
-			Files.copy(file.getInputStream(), Paths.get("C:/TEMP/classes", file.getOriginalFilename()));
-		} catch (IOException|RuntimeException e) {
-			; // e.getMessage()
+			file.getInputStream().read(data);
+			return "";
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
+		
+		
+		// We actually update or create only one asset per account
+		Asset asset = null;
+		if(assets.size() == 0) {
+			asset = new Asset();
+			repository.addAsset(acc, asset);
+		}
+		else {
+			asset = assets.get(0);
+		}
+
+		asset.setName(file.getName()); // or getFileName()
+		asset.setData(data);
 
 		return "{}";
 	}
