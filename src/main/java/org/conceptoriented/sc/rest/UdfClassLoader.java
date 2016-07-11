@@ -99,11 +99,13 @@ public class UdfClassLoader extends ClassLoader {
 
         try {
         	// Find bytes for the class name
-            InputStream in = getResourceAsStream(className.replace('.', '/') + ".class");
+            //InputStream in = getResourceAsStream(className.replace('.', '/') + ".class");
             //ByteArrayOutputStream out = new ByteArrayOutputStream();
             //StreamUtils.writeTo(in, out);
             //byte[] classData = out.toByteArray();
-            byte[] classData = org.springframework.util.StreamUtils.copyToByteArray(in);
+            //byte[] classData = org.springframework.util.StreamUtils.copyToByteArray(in);
+
+            byte[] classData = getResourceAsBytes(className.replace('.', '/') + ".class");
 
             // Use bytes to create a class
             clazz = defineClass(className, classData, 0, classData.length);
@@ -141,8 +143,10 @@ public class UdfClassLoader extends ClassLoader {
 	}
 
 	// http://stackoverflow.com/questions/16602668/creating-a-classloader-to-load-a-jar-file-from-a-byte-array
-	@Override
-	public InputStream getResourceAsStream(String name) {
+	//@Override
+	//public byte[] getResourceAsStream(String name) {}
+
+	public byte[] getResourceAsBytes(String name) {
 
 		List<Asset> assets = account.getAssets(".jar");
 		if(assets.size() == 0) return null;
@@ -152,9 +156,18 @@ public class UdfClassLoader extends ClassLoader {
 		try (JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jarBytes))) {
 	        JarEntry entry;
 	        while ((entry = jis.getNextJarEntry()) != null) {
-	            if (entry.getName().equals(name)) {
-	                return jis;
-	            }
+	            if (!entry.getName().equals(name)) continue;
+	            
+	            byte[] bytes = org.springframework.util.StreamUtils.copyToByteArray(jis);
+
+	            /*
+	            ByteArrayOutputStream out = new ByteArrayOutputStream();
+	            org.springframework.util.StreamUtils.copy(jis, out);
+	            byte[] bytes = out.toByteArray();
+	            int aaa = bytes.length;
+	            */
+
+	            return bytes;
 	        }
 	    } catch (IOException e) {
 	        e.printStackTrace();

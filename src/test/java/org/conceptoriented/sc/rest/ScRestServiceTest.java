@@ -2,9 +2,11 @@ package org.conceptoriented.sc.rest;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
 
-import org.conceptoriented.sc.rest.Application;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,6 +27,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import org.conceptoriented.sc.core.*;
+import org.conceptoriented.sc.rest.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
@@ -48,12 +53,52 @@ public class ScRestServiceTest {
 	@Test
 	public void testRestExecute() throws Exception {
 		System.out.println(">>>>>>>>>>>>>>>>>>>>> testRestExecute");
-		
+
 		String result = template.getForObject(base.toString() + "/api/ping", String.class);
 
 		assertEquals("StreamCommandr", result);
 
 		result = template.getForObject(base.toString() + "ping", String.class);
-}
+	}
+
+	@Test
+	public void testClassLoader() throws Exception {
+		System.out.println(">>>>>>>>>>>>>>>>>>>>> testClassLoader");
+		
+		String fileName = "EvaluatorB.jar";
+		
+		// Read custom jar
+		InputStream stream;
+		stream = getClass().getClassLoader().getResourceAsStream(fileName);
+        //stream = resource.getInputStream();
+        byte[] fileData = org.springframework.util.StreamUtils.copyToByteArray(stream);
+
+        //File file = org.springframework.util.ResourceUtils.getFile("application.properties");
+        //fileData = Files.readAllBytes(file.toPath());
+		
+
+		// Add custom jar file to the account
+        Asset ass = new Asset();
+        ass.setData(fileData);
+        ass.setName(fileName);
+
+		Repository repo = new Repository();
+        Account acc = repo.getAccountForName("test@host.com");
+        acc.setClassLoader(new UdfClassLoader(acc));
+        repo.addAsset(acc, ass);
+		
+        // Define a column which uses a custom class
+        Space space = repo.getSpacesForAccount(acc.getId()).get(0);
+        space.setClassLoader(acc.getClassLoader()); // TODO: We need to do it from the account, that is, any space gets its class loder from its account
+        
+        Column column = space.getColumn("Table 1", "Column 11");
+        String descr = "{ `class`:`org.conceptoriented.sc.core.EvaluatorB`, `dependencies`:[`B`,`A`] }";
+        column.setDescriptor(descr.replace('`', '"'));
+        
+        // Evaluate space - it has to load the class dynamically
+        column.getEvaluator();
+        column.evaluate();
+        
+	}
 
 }

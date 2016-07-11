@@ -215,6 +215,7 @@ class Account {
 
 	public Account(Repository repository, String name) {
 		this.id = UUID.randomUUID();
+		this.name = name;
 		
 		this.repository = repository;
 		
