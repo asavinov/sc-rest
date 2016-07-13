@@ -82,6 +82,10 @@ public class Repository  {
 		return ret;
 	}
 	public Space addSpace(Account account, Space space) {
+		if(account.getClassLoader() != null) {
+			// Space will use its account loader which knows how to load classes from this account assets
+			space.setClassLoader(account.getClassLoader());
+		}
 		spaces.put(space, account);
 		return space;
 	}
@@ -140,6 +144,7 @@ public class Repository  {
 		Account account = new Account(this, "test@host.com");
 		accounts.add(account);
 
+		/*
 		URL[] classUrl = new URL[1];
 		try {
 			// We might also add more specific folder for this space only (like subfolder with space id)
@@ -147,14 +152,13 @@ public class Repository  {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-
 		URLClassLoader classLoader = new URLClassLoader(classUrl);
 		account.setClassLoader(classLoader);
+		*/
 
 		// Space
 		Space space = new Space("My Space");
-		space.setClassLoader(account.getClassLoader()); // Space will use its account loader which knows how to load from assets
-		this.addSpace(account, space);
+		this.addSpace(account, space); // Here space will get class loader from its account
 		
 		// Schema
 		Table t1 = space.createTable("Table 1");

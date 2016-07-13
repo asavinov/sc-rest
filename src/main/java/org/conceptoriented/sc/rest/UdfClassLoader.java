@@ -105,7 +105,7 @@ public class UdfClassLoader extends ClassLoader {
             //byte[] classData = out.toByteArray();
             //byte[] classData = org.springframework.util.StreamUtils.copyToByteArray(in);
 
-            byte[] classData = getResourceAsBytes(className.replace('.', '/') + ".class");
+        	byte[] classData = getClassBytesFromAssets(className.replace('.', '/') + ".class");
 
             // Use bytes to create a class
             clazz = defineClass(className, classData, 0, classData.length);
@@ -146,19 +146,36 @@ public class UdfClassLoader extends ClassLoader {
 	//@Override
 	//public byte[] getResourceAsStream(String name) {}
 
-	public byte[] getResourceAsBytes(String name) {
+
+	// This method knows about assets and how to work with classes in assets
+	protected byte[] getClassBytesFromAssets(String name) {
 
 		List<Asset> assets = account.getAssets(".jar");
-		if(assets.size() == 0) return null;
+		
+		for(Asset asset : assets) {
+			byte[] jarBytes = asset.getData();
+			byte[] classBytes = getClassBytesFromJarBytes(jarBytes, name);
+			if(classBytes != null && classBytes.length > 0) return classBytes;
+		}
 
-		byte[] jarBytes = assets.get(0).getData();
+		return null;
+	}
+
+	// Loop through all entries in the jar bytes and find the specified class
+	protected byte[] getClassBytesFromJarBytes(byte[] jarBytes, String name) {
+		if(jarBytes == null || jarBytes.length == 0 || name == null) return null;
 
 		try (JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jarBytes))) {
 	        JarEntry entry;
 	        while ((entry = jis.getNextJarEntry()) != null) {
-	            if (!entry.getName().equals(name)) continue;
+	
+	        	if (!entry.getName().equals(name)) continue;
 	            
 	            byte[] bytes = org.springframework.util.StreamUtils.copyToByteArray(jis);
+	            
+	            // Will it not be closed automatically since it is within try/catch?
+	            jis.closeEntry();
+	            jis.close();
 
 	            /*
 	            ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -175,6 +192,7 @@ public class UdfClassLoader extends ClassLoader {
 	    return null;
 	}
 
+	
 	protected byte[] loadClassDataFromFile(String name) {
 
 		/*
