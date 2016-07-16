@@ -219,7 +219,10 @@ public class ScRestService {
 		for(Record record : records) {
 			table.push(record);
 		}
-		return "";
+		
+		table.getSpace().evaluate();
+
+		return "{}";
 	}
 
 	//
@@ -288,11 +291,10 @@ public class ScRestService {
 		byte[] data = new byte[(int)file.getSize()];
 		try {
 			file.getInputStream().read(data);
-			return "";
+			return "{}";
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
 		
 		// We actually update or create only one asset per account
 		Asset asset = null;

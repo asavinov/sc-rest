@@ -161,13 +161,17 @@ public class Repository  {
 		this.addSpace(account, space); // Here space will get class loader from its account
 		
 		// Schema
-		Table t1 = space.createTable("Table 1");
-		space.createColumn("Column 11", "Table 1", "Double");
-		space.createColumn("Column 12", "Table 1", "String");
+		Table t1 = space.createTable("T");
+		t1.maxRows = 3;
+		space.createColumn("A", "T", "Double");
+		space.createColumn("B", "T", "Double");
+		Column c13 = space.createColumn("C", "T", "Double");
+        String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`C`,`A`,`B`] }";
+		c13.setDescriptor(d13.replace('`', '"'));
 		
 		space.createTable("Table 2");
-		space.createColumn("Column 21", "Table 2", "Integer");
-		space.createColumn("Column 22", "Table 2", "String");
+		space.createColumn("Column 21", "Table 2", "Double");
+		space.createColumn("Column 22", "Table 2", "Double");
 	}
 
 }
