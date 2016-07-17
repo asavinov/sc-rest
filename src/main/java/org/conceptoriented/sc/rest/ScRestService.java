@@ -59,16 +59,16 @@ public class ScRestService {
 	}
 
 	//
-	// Spaces and their elements
+	// Schemas and their elements
 	//
 
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/spaces", method = RequestMethod.GET) // Get all spaces (of an account)
-	public String /* with List<Space> */ getSpaces(HttpSession session) {
+	@RequestMapping(value = "/schemas", method = RequestMethod.GET) // Get all schemas (of an account)
+	public String /* with List<Schema> */ getSchemas(HttpSession session) {
 		Account acc = repository.getAccountForName("test@host.com");
-		List<Space> spaces = repository.getSpacesForAccount(acc.getId());
+		List<Schema> schemas = repository.getSchemasForAccount(acc.getId());
 		String jelems = "";
-		for(Space elem : spaces) {
+		for(Schema elem : schemas) {
 			String jelem = elem.toJson();
 			jelems += jelem + ", ";
 		}
@@ -78,45 +78,45 @@ public class ScRestService {
 		return "{\"data\": [" + jelems + "]}";
 	}
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/spaces", method = RequestMethod.POST, produces = "application/json") // Create one (or several) spaces
-	public String /* of List<Space> */ createSpaces(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+	@RequestMapping(value = "/schemas", method = RequestMethod.POST, produces = "application/json") // Create one (or several) schemas
+	public String /* of List<Schema> */ createSchemas(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForName("test@host.com");
-		Space space = Space.fromJson(body);
-		repository.addSpace(acc, space);
-		return space.toJson();
+		Schema schema = Schema.fromJson(body);
+		repository.addSchema(acc, schema);
+		return schema.toJson();
 	}
 
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/spaces/{id}", method = RequestMethod.GET, produces = "application/json") // Get one space with the specified id
-	public String /* of Space */ getSpace(HttpSession session, @PathVariable String id) { 
+	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.GET, produces = "application/json") // Get one schema with the specified id
+	public String /* of Schema */ getSchema(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForName("test@host.com");
-		Space space = repository.getSpace(UUID.fromString(id));
-		return space.toJson();
+		Schema schema = repository.getSchema(UUID.fromString(id));
+		return schema.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/spaces/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing space
-	public String /* of Space */ updateSpace(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing schema
+	public String /* of Schema */ updateSchema(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForName("test@host.com");
-		Space space = repository.getSpace(UUID.fromString(id));
+		Schema schema = repository.getSchema(UUID.fromString(id));
 
-		return space.toJson();
+		return schema.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/spaces/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified space (and all its elements)
-	public void deleteSpace(HttpSession session, @PathVariable String id) { 
+	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified schema (and all its elements)
+	public void deleteSchema(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForName("test@host.com");
-		Space space = repository.getSpace(UUID.fromString(id));
+		Schema schema = repository.getSchema(UUID.fromString(id));
 	}
 	
-	// Tables of one space
+	// Tables of one schema
 	
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/spaces/{id}/tables", method = RequestMethod.GET, produces = "application/json") // Read all tables in the space
+	@RequestMapping(value = "/schemas/{id}/tables", method = RequestMethod.GET, produces = "application/json") // Read all tables in the schema
 	public String /* of List<Table> */ getTables(HttpSession session, @PathVariable String id) {
 		Account acc = repository.getAccountForName("test@host.com");
-		Space space = repository.getSpace(UUID.fromString(id));
+		Schema schema = repository.getSchema(UUID.fromString(id));
 		String jelems = "";
-		for(Table elem : space.getTables()) {
+		for(Table elem : schema.getTables()) {
 			String jelem = elem.toJson();
 			jelems += jelem + ", ";
 		}
@@ -125,23 +125,23 @@ public class ScRestService {
 		}
 		return "{\"data\": [" + jelems + "]}";
 	}
-	@RequestMapping(value = "/spaces/{id}/tables", method = RequestMethod.POST, produces = "application/json") // Create one (or several) tables. Return 201 Status Code and (optionally) the newly created id.
+	@RequestMapping(value = "/schemas/{id}/tables", method = RequestMethod.POST, produces = "application/json") // Create one (or several) tables. Return 201 Status Code and (optionally) the newly created id.
 	public String /* of List<Table> */ createTables(HttpSession session, @PathVariable String id, @RequestBody String body) {
 		Account acc = repository.getAccountForName("test@host.com");
-		Space space = repository.getSpace(UUID.fromString(id));
-		Table table = space.createTableFromJson(body);
+		Schema schema = repository.getSchema(UUID.fromString(id));
+		Table table = schema.createTableFromJson(body);
 		return table.toJson();
 	}
 	
-	// Columns of one space 
+	// Columns of one schema 
 
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/spaces/{id}/columns", method = RequestMethod.GET, produces = "application/json") // Read all columns in the space
+	@RequestMapping(value = "/schemas/{id}/columns", method = RequestMethod.GET, produces = "application/json") // Read all columns in the schema
 	public String /* with List<Column> */ getColumns(HttpSession session, @PathVariable String id) {
 		Account acc = repository.getAccountForName("test@host.com");
-		Space space = repository.getSpace(UUID.fromString(id));
+		Schema schema = repository.getSchema(UUID.fromString(id));
 		String jelems = "";
-		for(Column elem : space.getColumns()) {
+		for(Column elem : schema.getColumns()) {
 			String jelem = elem.toJson();
 			jelems += jelem + ", ";
 		}
@@ -151,11 +151,11 @@ public class ScRestService {
 		return "{\"data\": [" + jelems + "]}";
 	}
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/spaces/{id}/columns", method = RequestMethod.POST, produces = "application/json") // Create one (or several) several columns
+	@RequestMapping(value = "/schemas/{id}/columns", method = RequestMethod.POST, produces = "application/json") // Create one (or several) several columns
 	public String /* of List<Column> */ createColumns(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForName("test@host.com");
-		Space space = repository.getSpace(UUID.fromString(id));
-		Column column = space.createColumnFromJson(body);
+		Schema schema = repository.getSchema(UUID.fromString(id));
+		Column column = schema.createColumnFromJson(body);
 		return column.toJson();
 	}
 	
@@ -175,9 +175,9 @@ public class ScRestService {
 	public String /* of Table */ updateTable(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForName("test@host.com");
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
-		Space space = table.getSpace();
+		Schema schema = table.getSchema();
 
-		space.updateTableFromJson(body);
+		schema.updateTableFromJson(body);
 		return table.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
@@ -185,9 +185,9 @@ public class ScRestService {
 	public void deleteTable(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForName("test@host.com");
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
-		Space space = table.getSpace();
+		Schema schema = table.getSchema();
 
-		space.deleteTable(id);
+		schema.deleteTable(id);
 	}
 
 	// Records from one table
@@ -220,7 +220,7 @@ public class ScRestService {
 			table.push(record);
 		}
 		
-		table.getSpace().evaluate();
+		table.getSchema().evaluate();
 
 		return "{}";
 	}
@@ -241,9 +241,9 @@ public class ScRestService {
 	public String /* of Column */ updateColumn(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForName("test@host.com");
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
-		Space space = column.getSpace();
+		Schema schema = column.getSchema();
 
-		space.updateColumnFromJson(body);
+		schema.updateColumnFromJson(body);
 		return column.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
@@ -251,9 +251,9 @@ public class ScRestService {
 	public void deleteColumn(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForName("test@host.com");
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
-		Space space = table.getSpace();
+		Schema schema = table.getSchema();
 
-		space.deleteColumn(id);
+		schema.deleteColumn(id);
 	}
 
 	//
@@ -321,9 +321,9 @@ public class ScRestService {
 // Criteria:
 // - Serialization is needed for two purposes: persistence and transfer to a web app 
 // - Java references to other domain objects have to be transformed to uuid during serialization and then resolved during de-serialization
-//   - This means that (de-)serializer need access to the whole space
+//   - This means that (de-)serializer need access to the whole schema
 // - Inheritance
-// - Whole space, Table w. cols, or individual obj
+// - Whole schema, Table w. cols, or individual obj
 // - Do not return json array [] directly. Use object {"content":[]}
 
 
@@ -355,7 +355,7 @@ GET /columns/123456/output/
 GET /cars?color=red - Returns a list of red cars
 
 
-Start evaluation in the space manually:
+Start evaluation in the schema manually:
 post /api/v1/analytic/execution - Execute the analytic synchronously.
 post /api/v1/analytic/execution/async - Execute the analytic asynchronously.
 
@@ -384,7 +384,7 @@ Use plural like /columns and /tables
 // ALTERNATIVE 1: Annotate domain classes to use custom serializer 
 
 //@JsonDeserialize(using = RoleDeserializer.class)
-@JsonSerialize(using = SpaceSerializer.class)
+@JsonSerialize(using = SchemaSerializer.class)
 class Some {
 	public String name;
 	public double age;
@@ -395,7 +395,7 @@ class Some {
 	}
 }
 
-class SpaceSerializer extends JsonSerializer<Some> {
+class SchemaSerializer extends JsonSerializer<Some> {
 	@Override
 	public void serialize(Some value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
 

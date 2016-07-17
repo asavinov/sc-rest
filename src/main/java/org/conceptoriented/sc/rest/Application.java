@@ -25,11 +25,11 @@ public class Application {
 
 	public static void main(String[] args) {
 		
-		// We need to create global repository of all spaces created by users
-		// For each request, the controller finds the corresponding space and then performs the operation
-		// Resolving spaces on requests can be performed by using session ids
-		// Each created space has creation time and it will be deleted after some timeout (just because its session is supposed to be expired and deleted)
-		Space space = new Space("My Space");
+		// We need to create global repository of all schemas created by users
+		// For each request, the controller finds the corresponding schema and then performs the operation
+		// Resolving schemas on requests can be performed by using session ids
+		// Each created schema has creation time and it will be deleted after some timeout (just because its session is supposed to be expired and deleted)
+		Schema schema = new Schema("My Schema");
 		
 		SpringApplication app = new SpringApplication(Application.class);
 		setProfile(app);

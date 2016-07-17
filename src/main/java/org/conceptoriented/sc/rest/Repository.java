@@ -24,7 +24,7 @@ public class Repository  {
 	protected File classDir;
 	
 	//
-	// All existing accounts. An account contains spaces, assets and parameters like name.
+	// All existing accounts. An account contains schemas, assets and parameters like name.
 	//
 	protected List<Account> accounts = new ArrayList<Account>();
 
@@ -53,54 +53,54 @@ public class Repository  {
 	}
 
 	//
-	// All existing spaces belonging to different users
+	// All existing schemas belonging to different users
 	//
-	protected Map<Space, Account> spaces = new HashMap<Space, Account>();
+	protected Map<Schema, Account> schemas = new HashMap<Schema, Account>();
 
-	public Space getSpace(UUID id) {
-		Optional<Space> ret = spaces.keySet()
+	public Schema getSchema(UUID id) {
+		Optional<Schema> ret = schemas.keySet()
 				.stream()
 				.filter(key -> key.getId().equals(id))
 				.findAny();
         if(ret.isPresent()) return ret.get();
         else return null;
 	}
-	public Space getSpaceForName(UUID id, String name) {
-		Optional<Space> ret = getSpacesForAccount(id)
+	public Schema getSchemaForName(UUID id, String name) {
+		Optional<Schema> ret = getSchemasForAccount(id)
 				.stream()
 				.filter(x -> x.getName().equals(name))
 				.findAny();
         if(ret.isPresent()) return ret.get();
         else return null;
 	}
-	public List<Space> getSpacesForAccount(UUID id) {
-		List<Space> ret = spaces.entrySet()
+	public List<Schema> getSchemasForAccount(UUID id) {
+		List<Schema> ret = schemas.entrySet()
 				.stream()
 				.filter(entry -> entry.getValue().getId().equals(id))
 				.map(Map.Entry::getKey)
-				.collect(Collectors.<Space>toList());
+				.collect(Collectors.<Schema>toList());
 		return ret;
 	}
-	public Space addSpace(Account account, Space space) {
+	public Schema addSchema(Account account, Schema schema) {
 		if(account.getClassLoader() != null) {
-			// Space will use its account loader which knows how to load classes from this account assets
-			space.setClassLoader(account.getClassLoader());
+			// Schema will use its account loader which knows how to load classes from this account assets
+			schema.setClassLoader(account.getClassLoader());
 		}
-		spaces.put(space, account);
-		return space;
+		schemas.put(schema, account);
+		return schema;
 	}
 
 	public Table getTable(UUID accId, UUID id) {
-		for(Space space : getSpacesForAccount(accId)) {
-			Table table = space.getTableById(id.toString());
+		for(Schema schema : getSchemasForAccount(accId)) {
+			Table table = schema.getTableById(id.toString());
 			if(table != null) return table;
 		}
 		return null;
 	}
 
 	public Column getColumn(UUID accId, UUID id) {
-		for(Space space : getSpacesForAccount(accId)) {
-			Column column = space.getColumnById(id.toString());
+		for(Schema schema : getSchemasForAccount(accId)) {
+			Column column = schema.getColumnById(id.toString());
 			if(column != null) return column;
 		}
 		return null;
@@ -133,7 +133,7 @@ public class Repository  {
 	}
 
 	public Repository() {
-		udfDir = "C:/temp/classes/"; // It is common for all space but can contain subfolders for individual spaces
+		udfDir = "C:/temp/classes/"; // It is common for all schema but can contain subfolders for individual schemas
 		classDir = new File(udfDir);
 
 		//
@@ -147,7 +147,7 @@ public class Repository  {
 		/*
 		URL[] classUrl = new URL[1];
 		try {
-			// We might also add more specific folder for this space only (like subfolder with space id)
+			// We might also add more specific folder for this schema only (like subfolder with schema id)
 			classUrl[0] = classDir.toURI().toURL();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
@@ -156,22 +156,22 @@ public class Repository  {
 		account.setClassLoader(classLoader);
 		*/
 
-		// Space
-		Space space = new Space("My Space");
-		this.addSpace(account, space); // Here space will get class loader from its account
+		// Schema
+		Schema schema = new Schema("My Schema");
+		this.addSchema(account, schema); // Here schema will get class loader from its account
 		
 		// Schema
-		Table t1 = space.createTable("T");
+		Table t1 = schema.createTable("T");
 		t1.maxRows = 3;
-		space.createColumn("A", "T", "Double");
-		space.createColumn("B", "T", "Double");
-		Column c13 = space.createColumn("C", "T", "Double");
+		schema.createColumn("A", "T", "Double");
+		schema.createColumn("B", "T", "Double");
+		Column c13 = schema.createColumn("C", "T", "Double");
         String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`C`,`A`,`B`] }";
 		c13.setDescriptor(d13.replace('`', '"'));
 		
-		space.createTable("Table 2");
-		space.createColumn("Column 21", "Table 2", "Double");
-		space.createColumn("Column 22", "Table 2", "Double");
+		schema.createTable("Table 2");
+		schema.createColumn("Column 21", "Table 2", "Double");
+		schema.createColumn("Column 22", "Table 2", "Double");
 	}
 
 }
@@ -202,7 +202,7 @@ class Account {
 	}
 	
 	// This class loader knows how to get evaluator classes/instances from the assets of this account. 
-	// It is injected into each space of this user so that custom columns can be evaluated.
+	// It is injected into each schema of this user so that custom columns can be evaluated.
 	private ClassLoader classLoader; 
 	public ClassLoader getClassLoader() {
 		return classLoader;

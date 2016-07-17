@@ -88,13 +88,13 @@ public class ScRestServiceTest {
         repo.addAsset(acc, ass);
 		
         // Define a column which uses a custom class
-        Space space = repo.getSpacesForAccount(acc.getId()).get(0);
+        Schema schema = repo.getSchemasForAccount(acc.getId()).get(0);
         
-        Column column = space.getColumn("Table 1", "Column 11");
+        Column column = schema.getColumn("Table 1", "Column 11");
         String descr = "{ `class`:`org.conceptoriented.sc.core.EvaluatorB`, `dependencies`:[`Column 11`,`Column 12`] }";
         column.setDescriptor(descr.replace('`', '"'));
         
-        // Evaluate space - it has to load the class dynamically
+        // Evaluate schema - it has to load the class dynamically
         column.evaluate();
         
 	}
