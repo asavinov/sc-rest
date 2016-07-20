@@ -125,6 +125,7 @@ public class ScRestService {
 		}
 		return "{\"data\": [" + jelems + "]}";
 	}
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/tables", method = RequestMethod.POST, produces = "application/json") // Create one (or several) tables. Return 201 Status Code and (optionally) the newly created id.
 	public String /* of List<Table> */ createTables(HttpSession session, @PathVariable String id, @RequestBody String body) {
 		Account acc = repository.getAccountForName("test@host.com");
