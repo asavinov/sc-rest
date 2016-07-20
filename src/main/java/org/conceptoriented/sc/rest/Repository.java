@@ -166,7 +166,7 @@ public class Repository  {
 		schema.createColumn("A", "T", "Double");
 		schema.createColumn("B", "T", "Double");
 		Column c13 = schema.createColumn("C", "T", "Double");
-        String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`C`,`A`,`B`] }";
+        String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
 		c13.setDescriptor(d13.replace('`', '"'));
 		
 		schema.createTable("Table 2");

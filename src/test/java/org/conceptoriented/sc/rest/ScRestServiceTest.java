@@ -90,8 +90,8 @@ public class ScRestServiceTest {
         // Define a column which uses a custom class
         Schema schema = repo.getSchemasForAccount(acc.getId()).get(0);
         
-        Column column = schema.getColumn("Table 1", "Column 11");
-        String descr = "{ `class`:`org.conceptoriented.sc.core.EvaluatorB`, `dependencies`:[`Column 11`,`Column 12`] }";
+        Column column = schema.getColumn("Table 2", "Column 21");
+        String descr = "{ `class`:`org.conceptoriented.sc.core.EvaluatorB`, `dependencies`:[`[Column 22]`] }";
         column.setDescriptor(descr.replace('`', '"'));
         
         // Evaluate schema - it has to load the class dynamically
