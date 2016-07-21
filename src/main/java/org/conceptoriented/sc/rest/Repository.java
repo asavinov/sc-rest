@@ -162,7 +162,7 @@ public class Repository  {
 		
 		// Schema
 		Table t1 = schema.createTable("T");
-		t1.maxRows = 3;
+		t1.setMaxLength(3);
 		schema.createColumn("A", "T", "Double");
 		schema.createColumn("B", "T", "Double");
 		Column c13 = schema.createColumn("C", "T", "Double");

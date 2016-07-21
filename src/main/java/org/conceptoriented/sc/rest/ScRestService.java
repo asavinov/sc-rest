@@ -218,7 +218,7 @@ public class ScRestService {
 
 		List<Record> records = Record.fromJsonList(body);
 		for(Record record : records) {
-			table.push(record);
+			table.write(record);
 		}
 		
 		table.getSchema().evaluate();
