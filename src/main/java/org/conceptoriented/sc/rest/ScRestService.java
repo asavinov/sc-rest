@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,7 +38,7 @@ import org.conceptoriented.sc.core.*;
 @RequestMapping("/api")
 public class ScRestService {
 	
-	private static final String crossOrigins = "http://localhost:3000";
+	private static final String crossOrigins = "*";
 
 	private static final Logger LOG = Logger.getLogger(ScRestService.class.getName());
 
@@ -65,7 +66,9 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas", method = RequestMethod.GET) // Get all schemas (of an account)
 	public String /* with List<Schema> */ getSchemas(HttpSession session) {
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		List<Schema> schemas = repository.getSchemasForAccount(acc.getId());
 		String jelems = "";
 		for(Schema elem : schemas) {
@@ -80,7 +83,9 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas", method = RequestMethod.POST, produces = "application/json") // Create one (or several) schemas
 	public String /* of List<Schema> */ createSchemas(HttpSession session, @PathVariable String id, @RequestBody String body) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Schema schema = Schema.fromJson(body);
 		repository.addSchema(acc, schema);
 		return schema.toJson();
@@ -89,22 +94,27 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.GET, produces = "application/json") // Get one schema with the specified id
 	public String /* of Schema */ getSchema(HttpSession session, @PathVariable String id) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		return schema.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing schema
 	public String /* of Schema */ updateSchema(HttpSession session, @PathVariable String id, @RequestBody String body) { 
-		Account acc = repository.getAccountForName("test@host.com");
-		Schema schema = repository.getSchema(UUID.fromString(id));
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
 
+		Schema schema = repository.getSchema(UUID.fromString(id));
 		return schema.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified schema (and all its elements)
 	public void deleteSchema(HttpSession session, @PathVariable String id) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Schema schema = repository.getSchema(UUID.fromString(id));
 	}
 	
@@ -112,8 +122,10 @@ public class ScRestService {
 	
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/tables", method = RequestMethod.GET, produces = "application/json") // Read all tables in the schema
-	public String /* of List<Table> */ getTables(HttpSession session, @PathVariable String id) {
-		Account acc = repository.getAccountForName("test@host.com");
+	public String /* of List<Table> */ getTables(HttpSession session, @PathVariable String id, HttpServletRequest req) {
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		String jelems = "";
 		for(Table elem : schema.getTables()) {
@@ -128,7 +140,9 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/tables", method = RequestMethod.POST, produces = "application/json") // Create one (or several) tables. Return 201 Status Code and (optionally) the newly created id.
 	public String /* of List<Table> */ createTables(HttpSession session, @PathVariable String id, @RequestBody String body) {
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		Table table = schema.createTableFromJson(body);
 		return table.toJson();
@@ -139,7 +153,9 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/columns", method = RequestMethod.GET, produces = "application/json") // Read all columns in the schema
 	public String /* with List<Column> */ getColumns(HttpSession session, @PathVariable String id) {
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		String jelems = "";
 		for(Column elem : schema.getColumns()) {
@@ -154,7 +170,9 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/columns", method = RequestMethod.POST, produces = "application/json") // Create one (or several) several columns
 	public String /* of List<Column> */ createColumns(HttpSession session, @PathVariable String id, @RequestBody String body) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		Column column = schema.createColumnFromJson(body);
 		return column.toJson();
@@ -167,14 +185,18 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.GET, produces = "application/json") // Read one table with the specified id
 	public String /* of Table */ getTable(HttpSession session, @PathVariable String id) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		return table.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing table
 	public String /* of Table */ updateTable(HttpSession session, @PathVariable String id, @RequestBody String body) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		Schema schema = table.getSchema();
 
@@ -184,7 +206,9 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
 	public void deleteTable(HttpSession session, @PathVariable String id) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		Schema schema = table.getSchema();
 
@@ -196,7 +220,9 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.GET, produces = "application/json") // Read records from one table with the specified id
 	public String /* of List<Records> */ getRecords(HttpSession session, @PathVariable String id) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		Range range = null; // All records
 		
@@ -213,16 +239,16 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.POST, produces = "application/json") // Create records in a table with a given id
 	public String /* of List<Records> */ createRecords(HttpSession session, @RequestBody String body, @PathVariable String id) {
-		Account acc = repository.getAccountForName("test@host.com");
-		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
 
+		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		List<Record> records = Record.fromJsonList(body);
 		for(Record record : records) {
 			table.write(record);
 		}
 		
 		table.getSchema().evaluate();
-
 		return "{}";
 	}
 
@@ -233,27 +259,31 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.GET, produces = "application/json") // Read one column with the specified id
 	public String /* of Column */ getColumn(HttpSession session, @PathVariable String id) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
 		return column.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing column
 	public String /* of Column */ updateColumn(HttpSession session, @PathVariable String id, @RequestBody String body) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
 		Schema schema = column.getSchema();
-
 		schema.updateColumnFromJson(body);
 		return column.toJson();
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
 	public void deleteColumn(HttpSession session, @PathVariable String id) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		Schema schema = table.getSchema();
-
 		schema.deleteColumn(id);
 	}
 
@@ -266,9 +296,10 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/assets", method = RequestMethod.GET, produces = "application/json") // Read all assets
 	public String /* with List<Asset> */ getAssets(HttpSession session) { 
-		Account acc = repository.getAccountForName("test@host.com");
-		List<Asset> assets = repository.getAssetsForAccount(acc.getId());
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
 
+		List<Asset> assets = repository.getAssetsForAccount(acc.getId());
 		String jelems = "";
 		for(Asset elem : assets) {
 			String jelem = "{}"; // elem.toJson();
@@ -282,9 +313,10 @@ public class ScRestService {
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/assets", method = RequestMethod.POST, produces = "application/json") // Create one (or several) assets
 	public String /* of List<Asset> */ createAssets(HttpSession session, @RequestParam("file") MultipartFile file) { 
-		Account acc = repository.getAccountForName("test@host.com");
+		Account acc = repository.getAccountForSession(session);
+		//Account acc = repository.getAccountForName("test@host.com");
+
 		List<Asset> assets = repository.getAssetsForAccount(acc.getId());
-		
 		if(file.isEmpty()) {
 			return "{   }"; // Error file is empty file.getOriginalFilename()
 		}

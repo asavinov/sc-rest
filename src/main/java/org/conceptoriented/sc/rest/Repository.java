@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpSession;
+
 import org.conceptoriented.sc.core.*;
 
 @Service
@@ -44,11 +46,74 @@ public class Repository  {
         if(ret.isPresent()) return ret.get();
         else return null;
 	}
-	public Account getAccountForSession(UUID id) { // One session per account
-		return null;
+	public Account getAccountForSession(HttpSession session) { // Find an account associated with this session
+
+		Optional<Account> ret = accounts
+				.stream()
+				.filter(x -> x.getSession().equals(session.getId()))
+				.findAny();
+
+		//
+		// Found an account for this session
+		//
+		
+		// Option 1: check the expiration time and other constraints
+
+		// Option 2: use the account without any checks
+
+		if(ret.isPresent()) return ret.get();
+		
+		//
+		// No account for this session
+		//
+		
+		// Option 1: reject the request because it is necessary to first perform login and associate a session with an account/user
+		
+		// Option 2: automatically create a new (sample/test) account by associating it also with a kind of anonymous user
+		Account acc = addSampleAccount();
+		acc.setSession(session.getId());
+
+		return acc;
 	}
 	public Account addAccount(Account account) {
 		accounts.add(account);
+		return account;
+	}
+	public Account addSampleAccount() {
+
+		// Account
+		Account account = new Account(this, "test@host.com");
+		accounts.add(account);
+
+		/*
+		URL[] classUrl = new URL[1];
+		try {
+			// We might also add more specific folder for this schema only (like subfolder with schema id)
+			classUrl[0] = classDir.toURI().toURL();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		URLClassLoader classLoader = new URLClassLoader(classUrl);
+		account.setClassLoader(classLoader);
+		*/
+
+		// Schema
+		Schema schema = new Schema("My Schema");
+		this.addSchema(account, schema); // Here schema will get class loader from its account
+		
+		// Schema
+		Table t1 = schema.createTable("T");
+		t1.setMaxLength(3);
+		schema.createColumn("A", "T", "Double");
+		schema.createColumn("B", "T", "Double");
+		Column c13 = schema.createColumn("C", "T", "Double");
+        String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
+		c13.setDescriptor(d13.replace('`', '"'));
+		
+		schema.createTable("Table 2");
+		schema.createColumn("Column 21", "Table 2", "Double");
+		schema.createColumn("Column 22", "Table 2", "Double");
+		
 		return account;
 	}
 
@@ -135,43 +200,6 @@ public class Repository  {
 	public Repository() {
 		udfDir = "C:/temp/classes/"; // It is common for all schema but can contain subfolders for individual schemas
 		classDir = new File(udfDir);
-
-		//
-		// Create sample repository
-		//
-
-		// Account
-		Account account = new Account(this, "test@host.com");
-		accounts.add(account);
-
-		/*
-		URL[] classUrl = new URL[1];
-		try {
-			// We might also add more specific folder for this schema only (like subfolder with schema id)
-			classUrl[0] = classDir.toURI().toURL();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		URLClassLoader classLoader = new URLClassLoader(classUrl);
-		account.setClassLoader(classLoader);
-		*/
-
-		// Schema
-		Schema schema = new Schema("My Schema");
-		this.addSchema(account, schema); // Here schema will get class loader from its account
-		
-		// Schema
-		Table t1 = schema.createTable("T");
-		t1.setMaxLength(3);
-		schema.createColumn("A", "T", "Double");
-		schema.createColumn("B", "T", "Double");
-		Column c13 = schema.createColumn("C", "T", "Double");
-        String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
-		c13.setDescriptor(d13.replace('`', '"'));
-		
-		schema.createTable("Table 2");
-		schema.createColumn("Column 21", "Table 2", "Double");
-		schema.createColumn("Column 22", "Table 2", "Double");
 	}
 
 }
@@ -183,8 +211,8 @@ class Account {
 		return id;
 	}
 
-	// Session id (only one session per account)
-	private String session;
+	// Session id (in future, there can be many sessions for one account)
+	private String session = "";
 	public String getSession() {
 		return session;
 	}
@@ -193,7 +221,7 @@ class Account {
 	}
 
 	// User/account name
-	private String name;
+	private String name = "";
 	public String getName() {
 		return name;
 	}
