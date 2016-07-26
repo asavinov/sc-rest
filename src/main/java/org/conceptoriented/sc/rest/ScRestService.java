@@ -76,12 +76,10 @@ public class ScRestService {
 			// Create an account and associate it with this session
 			acc = repository.addSampleAccount();
 			acc.setSession(session.getId());
-			
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
 		}
 		
 		// Already logged in.
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok("{}");
 	}
 
 	//
