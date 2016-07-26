@@ -15,6 +15,8 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,11 +54,34 @@ public class ScRestService {
 	// Test
 	//
 
+	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(method = RequestMethod.GET, value = "/ping", produces = "text/plain")
-	public String ping(HttpServletRequest request /*HttpSession session*/) {
+	public ResponseEntity<String> ping(HttpServletRequest request /*HttpSession session*/) {
 		HttpSession session = request.getSession();
 		LOG.info("SUCCESS");
-		return "StreamCommandr";
+		return ResponseEntity.ok("StreamCommandr");
+	}
+
+	//
+	// Authentication
+	//
+
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/login", method = RequestMethod.GET) // Get session or token
+	public ResponseEntity<String> login(HttpSession session) {
+		Account acc = repository.getAccountForSession(session);
+		if(acc == null) {
+			// Perform login
+
+			// Create an account and associate it with this session
+			acc = repository.addSampleAccount();
+			acc.setSession(session.getId());
+			
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
+		
+		// Already logged in.
+		return ResponseEntity.ok(null);
 	}
 
 	//
@@ -65,9 +90,11 @@ public class ScRestService {
 
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas", method = RequestMethod.GET) // Get all schemas (of an account)
-	public String /* with List<Schema> */ getSchemas(HttpSession session) {
+	public ResponseEntity<String> /* with List<Schema> */ getSchemas(HttpSession session) {
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		List<Schema> schemas = repository.getSchemasForAccount(acc.getId());
 		String jelems = "";
@@ -78,53 +105,64 @@ public class ScRestService {
 		if(jelems.length() > 2) {
 			jelems = jelems.substring(0, jelems.length()-2);
 		}
-		return "{\"data\": [" + jelems + "]}";
+		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas", method = RequestMethod.POST, produces = "application/json") // Create one (or several) schemas
-	public String /* of List<Schema> */ createSchemas(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+	public ResponseEntity<String> /* of List<Schema> */ createSchemas(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Schema schema = Schema.fromJson(body);
 		repository.addSchema(acc, schema);
-		return schema.toJson();
+		return ResponseEntity.ok( schema.toJson() );
 	}
 
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.GET, produces = "application/json") // Get one schema with the specified id
-	public String /* of Schema */ getSchema(HttpSession session, @PathVariable String id) { 
+	public ResponseEntity<String> /* of Schema */ getSchema(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
-		return schema.toJson();
+		return ResponseEntity.ok( schema.toJson() );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing schema
-	public String /* of Schema */ updateSchema(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+	public ResponseEntity<String> /* of Schema */ updateSchema(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
-		return schema.toJson();
+		return ResponseEntity.ok( schema.toJson() );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified schema (and all its elements)
-	public void deleteSchema(HttpSession session, @PathVariable String id) { 
+	public ResponseEntity<String> deleteSchema(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
+		return ResponseEntity.ok(null);
 	}
 	
 	// Tables of one schema
 	
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/tables", method = RequestMethod.GET, produces = "application/json") // Read all tables in the schema
-	public String /* of List<Table> */ getTables(HttpSession session, @PathVariable String id, HttpServletRequest req) {
+	public ResponseEntity<String> /* of List<Table> */ getTables(HttpSession session, @PathVariable String id, HttpServletRequest req) {
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		String jelems = "";
@@ -135,26 +173,30 @@ public class ScRestService {
 		if(jelems.length() > 2) {
 			jelems = jelems.substring(0, jelems.length()-2);
 		}
-		return "{\"data\": [" + jelems + "]}";
+		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/tables", method = RequestMethod.POST, produces = "application/json") // Create one (or several) tables. Return 201 Status Code and (optionally) the newly created id.
-	public String /* of List<Table> */ createTables(HttpSession session, @PathVariable String id, @RequestBody String body) {
+	public ResponseEntity<String> /* of List<Table> */ createTables(HttpSession session, @PathVariable String id, @RequestBody String body) {
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		Table table = schema.createTableFromJson(body);
-		return table.toJson();
+		return ResponseEntity.ok( table.toJson() );
 	}
 	
 	// Columns of one schema 
 
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/columns", method = RequestMethod.GET, produces = "application/json") // Read all columns in the schema
-	public String /* with List<Column> */ getColumns(HttpSession session, @PathVariable String id) {
+	public ResponseEntity<String> /* with List<Column> */ getColumns(HttpSession session, @PathVariable String id) {
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		String jelems = "";
@@ -165,17 +207,19 @@ public class ScRestService {
 		if(jelems.length() > 2) {
 			jelems = jelems.substring(0, jelems.length()-2);
 		}
-		return "{\"data\": [" + jelems + "]}";
+		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/columns", method = RequestMethod.POST, produces = "application/json") // Create one (or several) several columns
-	public String /* of List<Column> */ createColumns(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+	public ResponseEntity<String> /* of List<Column> */ createColumns(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		Column column = schema.createColumnFromJson(body);
-		return column.toJson();
+		return ResponseEntity.ok( column.toJson() );
 	}
 	
 	//
@@ -184,44 +228,53 @@ public class ScRestService {
 
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.GET, produces = "application/json") // Read one table with the specified id
-	public String /* of Table */ getTable(HttpSession session, @PathVariable String id) { 
+	public ResponseEntity<String> /* of Table */ getTable(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
-		return table.toJson();
+		return ResponseEntity.ok( table.toJson() );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing table
-	public String /* of Table */ updateTable(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+	public ResponseEntity<String> /* of Table */ updateTable(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		Schema schema = table.getSchema();
 
 		schema.updateTableFromJson(body);
-		return table.toJson();
+		return ResponseEntity.ok( table.toJson() );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
-	public void deleteTable(HttpSession session, @PathVariable String id) { 
+	public ResponseEntity<String> deleteTable(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		Schema schema = table.getSchema();
 
 		schema.deleteTable(id);
+		return ResponseEntity.ok(null);
 	}
 
 	// Records from one table
 
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.GET, produces = "application/json") // Read records from one table with the specified id
-	public String /* of List<Records> */ getRecords(HttpSession session, @PathVariable String id) { 
+	public ResponseEntity<String> /* of List<Records> */ getRecords(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		Range range = null; // All records
@@ -234,13 +287,15 @@ public class ScRestService {
 		if(jelems.length() > 2) {
 			jelems = jelems.substring(0, jelems.length()-2);
 		}
-		return "{\"data\": [" + jelems + "]}";
+		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.POST, produces = "application/json") // Create records in a table with a given id
-	public String /* of List<Records> */ createRecords(HttpSession session, @RequestBody String body, @PathVariable String id) {
+	public ResponseEntity<String> /* of List<Records> */ createRecords(HttpSession session, @RequestBody String body, @PathVariable String id) {
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		List<Record> records = Record.fromJsonList(body);
@@ -249,7 +304,7 @@ public class ScRestService {
 		}
 		
 		table.getSchema().evaluate();
-		return "{}";
+		return ResponseEntity.ok("{}");
 	}
 
 	//
@@ -258,33 +313,40 @@ public class ScRestService {
 	
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.GET, produces = "application/json") // Read one column with the specified id
-	public String /* of Column */ getColumn(HttpSession session, @PathVariable String id) { 
+	public ResponseEntity<String> /* of Column */ getColumn(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
-		return column.toJson();
+		return ResponseEntity.ok( column.toJson() );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing column
-	public String /* of Column */ updateColumn(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+	public ResponseEntity<String> /* of Column */ updateColumn(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
 		Schema schema = column.getSchema();
 		schema.updateColumnFromJson(body);
-		return column.toJson();
+		return ResponseEntity.ok( column.toJson() );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
-	public void deleteColumn(HttpSession session, @PathVariable String id) { 
+	public ResponseEntity<String> deleteColumn(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		Schema schema = table.getSchema();
 		schema.deleteColumn(id);
+		return ResponseEntity.ok(null);
 	}
 
 	//
@@ -295,9 +357,11 @@ public class ScRestService {
 
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/assets", method = RequestMethod.GET, produces = "application/json") // Read all assets
-	public String /* with List<Asset> */ getAssets(HttpSession session) { 
+	public ResponseEntity<String> /* with List<Asset> */ getAssets(HttpSession session) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		List<Asset> assets = repository.getAssetsForAccount(acc.getId());
 		String jelems = "";
@@ -308,23 +372,25 @@ public class ScRestService {
 		if(jelems.length() > 2) {
 			jelems = jelems.substring(0, jelems.length()-2);
 		}
-		return "{\"data\": [" + jelems + "]}";
+		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/assets", method = RequestMethod.POST, produces = "application/json") // Create one (or several) assets
-	public String /* of List<Asset> */ createAssets(HttpSession session, @RequestParam("file") MultipartFile file) { 
+	public ResponseEntity<String> /* of List<Asset> */ createAssets(HttpSession session, @RequestParam("file") MultipartFile file) { 
 		Account acc = repository.getAccountForSession(session);
-		//Account acc = repository.getAccountForName("test@host.com");
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+		}
 
 		List<Asset> assets = repository.getAssetsForAccount(acc.getId());
 		if(file.isEmpty()) {
-			return "{   }"; // Error file is empty file.getOriginalFilename()
+			return ResponseEntity.ok("{}"); // Error file is empty file.getOriginalFilename()
 		}
 
 		byte[] data = new byte[(int)file.getSize()];
 		try {
 			file.getInputStream().read(data);
-			return "{}";
+			return ResponseEntity.ok("{}");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -342,7 +408,7 @@ public class ScRestService {
 		asset.setName(file.getName()); // or getFileName()
 		asset.setData(data);
 
-		return "{}";
+		return ResponseEntity.ok("{}");
 	}
 	
 	// One asset
@@ -363,13 +429,41 @@ public class ScRestService {
 /*
 
 FOLLOW this template (rather than many or one)
-GET    /users       - Return a list of all users (you may not want to make this publically available)
+GET    /users       - Return a list of all users (you may not want to make this publicly available)
 GET    /users/:id   - Return the user with that id
-POST   /users      - Create a new user. Return a 201 Status Code and the newly created id (if you want)
-PUT    /users/:id   - Update the user with that id
-DELETE /users/:id  - Delete the user with that id
+POST   /users      - Create a new user. Return a 201 Status Code and the newly created id (if you want). HttpStatus.CREATED
+PUT    /users/:id   - Update the user with that id. 
+DELETE /users/:id  - Delete the user with that id.
 
 
+session expired, 400 (safest, facebook), 401 (Unauthorized, not relevant) with custom error JSON response (facebook):
+{
+  "error": {
+    "message": "Error validating access token: Session has expired on Jul 17, 2014 9:00am. The current time is Jul 17, 2014 9:07am.",
+    "type": "OAuthException",
+    "code": 190,
+    "error_subcode": 463
+  }
+}
+
+OR
+https://developers.google.com/doubleclick-search/v2/standard-error-responses
+{
+ "error": {
+  "errors": [
+   {
+    "domain": "global",
+    "reason": "invalidParameter",
+    "message": "Invalid string value: 'asdf'. Allowed values: [mostpopular]",
+    "locationType": "parameter",
+    "location": "chart"
+   }
+  ],
+  "code": 400,
+  "message": "Invalid string value: 'asdf'. Allowed values: [mostpopular]"
+ }
+}
+ 
 
 http://blog.mwaysolutions.com/2014/06/05/10-best-practices-for-better-restful-api/
 
@@ -446,3 +540,25 @@ class SchemaSerializer extends JsonSerializer<Some> {
 
 
 //ALTERNATIVE 3: Implement special methods of the domain class which can serialized its instances
+
+
+class ResponseError {
+	public String code;
+	public String message;
+	
+	public String toJson() {
+		String jcode = "`code`:`" + code + "`";
+		String jmessage = "`message`:`" + message + "`";
+		String json = "{`error`: {" + jcode + ", " + jmessage + "}}";
+		return json.replace('`', '"');
+	}
+
+	public static String error(String code, String message) {
+		return (new ResponseError(code, message)).toJson();
+	}
+
+	public ResponseError(String code, String message) {
+		this.code = code;
+		this.message = message;
+	}
+}

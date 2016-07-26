@@ -68,12 +68,12 @@ public class Repository  {
 		//
 		
 		// Option 1: reject the request because it is necessary to first perform login and associate a session with an account/user
+		return null;
 		
 		// Option 2: automatically create a new (sample/test) account by associating it also with a kind of anonymous user
-		Account acc = addSampleAccount();
-		acc.setSession(session.getId());
-
-		return acc;
+		//Account acc = addSampleAccount();
+		//acc.setSession(session.getId());
+		//return acc;
 	}
 	public Account addAccount(Account account) {
 		accounts.add(account);
