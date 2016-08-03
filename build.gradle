@@ -31,10 +31,10 @@ version = 0.1
 
 dependencies {	
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.conceptoriented.sc:sc-core:0.1")
+    compile("org.conceptoriented:sc-core:0.1.0")
 
 	testCompile("org.springframework.boot:spring-boot-starter-test")
-    testCompile("org.conceptoriented.sc:sc-core:0.1")
+    testCompile("org.conceptoriented:sc-core:0.1.0")
 }
 
 task wrapper(type: Wrapper) {
