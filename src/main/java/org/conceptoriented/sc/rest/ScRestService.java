@@ -341,8 +341,8 @@ public class ScRestService {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
 		}
 
-		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
-		Schema schema = table.getSchema();
+		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
+		Schema schema = column.getSchema();
 		schema.deleteColumn(id);
 		return ResponseEntity.ok(null);
 	}
