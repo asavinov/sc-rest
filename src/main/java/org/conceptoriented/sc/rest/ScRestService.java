@@ -91,7 +91,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* with List<Schema> */ getSchemas(HttpSession session) {
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		List<Schema> schemas = repository.getSchemasForAccount(acc.getId());
@@ -110,7 +110,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of List<Schema> */ createSchemas(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Schema schema = Schema.fromJson(body);
@@ -123,7 +123,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of Schema */ getSchema(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
@@ -134,7 +134,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of Schema */ updateSchema(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
@@ -145,7 +145,7 @@ public class ScRestService {
 	public ResponseEntity<String> deleteSchema(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
@@ -159,7 +159,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of List<Table> */ getTables(HttpSession session, @PathVariable String id, HttpServletRequest req) {
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
@@ -178,7 +178,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of List<Table> */ createTables(HttpSession session, @PathVariable String id, @RequestBody String body) {
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
@@ -193,7 +193,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* with List<Column> */ getColumns(HttpSession session, @PathVariable String id) {
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
@@ -212,7 +212,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of List<Column> */ createColumns(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
@@ -229,7 +229,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of Table */ getTable(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
@@ -240,7 +240,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of Table */ updateTable(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
@@ -254,7 +254,7 @@ public class ScRestService {
 	public ResponseEntity<String> deleteTable(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
@@ -271,7 +271,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of List<Records> */ getRecords(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
@@ -292,7 +292,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of List<Records> */ createRecords(HttpSession session, @RequestBody String body, @PathVariable String id) {
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
@@ -314,7 +314,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of Column */ getColumn(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
@@ -325,7 +325,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of Column */ updateColumn(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
@@ -338,7 +338,7 @@ public class ScRestService {
 	public ResponseEntity<String> deleteColumn(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
@@ -358,7 +358,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* with List<Asset> */ getAssets(HttpSession session) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		List<Asset> assets = repository.getAssetsForAccount(acc.getId());
@@ -377,7 +377,7 @@ public class ScRestService {
 	public ResponseEntity<String> /* of List<Asset> */ createAssets(HttpSession session, @RequestParam("file") MultipartFile file) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseError.error("400", "Session expired."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ScServiceError.error(ScServiceErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
 
 		List<Asset> assets = repository.getAssetsForAccount(acc.getId());
@@ -540,23 +540,70 @@ class SchemaSerializer extends JsonSerializer<Some> {
 //ALTERNATIVE 3: Implement special methods of the domain class which can serialized its instances
 
 
-class ResponseError {
-	public String code;
+class ScServiceError {
+	public ScServiceErrorCode code;
 	public String message;
+	public String message2;
 	
 	public String toJson() {
-		String jcode = "`code`:`" + code + "`";
+		String jcode = "`code`:" + code.getValue() + "";
 		String jmessage = "`message`:`" + message + "`";
-		String json = "{`error`: {" + jcode + ", " + jmessage + "}}";
+		String jmessage2 = "`message2`:`" + message2 + "`";
+		String json = "{`error`: {" + jcode + ", " + jmessage + ", " + jmessage2 + "}}";
 		return json.replace('`', '"');
 	}
 
-	public static String error(String code, String message) {
-		return (new ResponseError(code, message)).toJson();
+	public static String error(ScServiceErrorCode code, String message2) {
+		String message = "";
+		switch(code) {
+
+			case NOT_FOUND_IDENTITY:
+				message = "Identity not found. Session expired.";
+				break;
+			case GET_ELEMENT:
+				message = "Error getting an element.";
+				break;
+			case CREATE_ELEMENT:
+				message = "Error creating an element.";
+				break;
+			case UPATE_ELEMENT:
+				message = "Error updating an element.";
+				break;
+			case DELETE_ELEMENT:
+				message = "Error deleting an element.";
+				break;
+			default:
+				message = "Unknown error";
+				break;
+		}
+		
+		ScServiceError error = new ScServiceError(code, message, message2);
+
+		return error.toJson();
 	}
 
-	public ResponseError(String code, String message) {
+	public static String error(ScServiceErrorCode code, String message, String message2) {
+		return (new ScServiceError(code, message, message2)).toJson();
+	}
+
+	public ScServiceError(ScServiceErrorCode code, String message, String message2) {
 		this.code = code;
 		this.message = message;
+		this.message2 = message2;
+	}
+}
+
+enum ScServiceErrorCode {
+	NOT_FOUND_IDENTITY(1), GET_ELEMENT(2), CREATE_ELEMENT(3), UPATE_ELEMENT(4), DELETE_ELEMENT(5)
+	;
+
+	private int value;
+
+	public int getValue() {
+		return value;
+	}
+
+	private ScServiceErrorCode(int value) {
+		this.value = value;
 	}
 }
