@@ -108,7 +108,7 @@ public class ScRestService {
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas", method = RequestMethod.POST, produces = "application/json") // Create one (or several) schemas
-	public ResponseEntity<String> /* of List<Schema> */ createSchemas(HttpSession session, @PathVariable String id, @RequestBody String body) { 
+	public ResponseEntity<String> /* of List<Schema> */ createSchemas(HttpSession session, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
@@ -118,6 +118,7 @@ public class ScRestService {
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating schema.", ""));
 
 		repository.addSchema(acc, schema);
+
 		return ResponseEntity.ok( schema.toJson() );
 	}
 
@@ -147,6 +148,8 @@ public class ScRestService {
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
 
+		schema.updateFromJson(body);
+
 		return ResponseEntity.ok( schema.toJson() );
 	}
 	@CrossOrigin(origins = crossOrigins)
@@ -159,6 +162,8 @@ public class ScRestService {
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
+		
+		repository.deleteSchema(schema);
 
 		return ResponseEntity.ok(null);
 	}

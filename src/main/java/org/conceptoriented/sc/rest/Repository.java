@@ -154,6 +154,9 @@ public class Repository  {
 		schemas.put(schema, account);
 		return schema;
 	}
+	public void deleteSchema(Schema schema) {
+		schemas.remove(schema);
+	}
 
 	public Table getTable(UUID accId, UUID id) {
 		for(Schema schema : getSchemasForAccount(accId)) {
