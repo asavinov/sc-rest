@@ -301,8 +301,8 @@ public class ScRestService {
 	// Records from one table
 
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.GET, produces = "application/json") // Read records from one table with the specified id
-	public ResponseEntity<String> /* of List<Records> */ getRecords(HttpSession session, @PathVariable String id) { 
+	@RequestMapping(value = "/tables/{id}/data/json", method = RequestMethod.GET, produces = "application/json") // Read records from one table with the specified id
+	public ResponseEntity<String> /* of List<Records> */ getRecordsJson(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
@@ -313,15 +313,43 @@ public class ScRestService {
 
 		Range range = null; // All records
 		
-		String jelems = "";
+		String data = "";
 		for(Record record : table.read(range)) {
-			String jelem = record.toJson();
-			jelems += jelem + ", ";
+			String data_elem = record.toJson();
+			data += data_elem + ", ";
 		}
-		if(jelems.length() > 2) {
-			jelems = jelems.substring(0, jelems.length()-2);
+		if(data.length() > 2) {
+			data = data.substring(0, data.length()-2);
 		}
-		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
+		return ResponseEntity.ok( "{\"data\": [" + data + "]}" );
+	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/tables/{id}/data/csv", method = RequestMethod.GET, produces = "application/json") // Read records from one table with the specified id
+	public ResponseEntity<String> /* of List<Records> */ getRecordsCsv(HttpSession session, @PathVariable String id) { 
+		Account acc = repository.getAccountForSession(session);
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
+		}
+
+		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
+		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
+
+		Range range = null; // All records
+		
+		List<String> columns = table.getSchema().getColumns(table.getName()).stream().map(x -> x.getName()).collect(Collectors.<String>toList());
+		String header = "";
+		for(String col : columns) {
+			header += col + ",";
+		}
+		if(header.length() >= 1) header = header.substring(0, header.length()-1);
+		header += "\n";
+
+		String data = "";
+		for(Record record : table.read(range)) {
+			String data_elem = record.toCsv(columns);
+			data += data_elem + "\n";
+		}
+		return ResponseEntity.ok( "" + header +  data + "" );
 	}
 	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data/json", method = RequestMethod.POST, produces = "application/json") // Create records in a table with a given id
