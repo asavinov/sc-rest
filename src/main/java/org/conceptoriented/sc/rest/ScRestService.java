@@ -324,8 +324,8 @@ public class ScRestService {
 		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.POST, produces = "application/json") // Create records in a table with a given id
-	public ResponseEntity<String> /* of List<Records> */ createRecords(HttpSession session, @RequestBody String body, @PathVariable String id) {
+	@RequestMapping(value = "/tables/{id}/data/json", method = RequestMethod.POST, produces = "application/json") // Create records in a table with a given id
+	public ResponseEntity<String> /* of List<Records> */ writeRecordsJson(HttpSession session, @PathVariable String id, @RequestBody String body) {
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
@@ -336,7 +336,28 @@ public class ScRestService {
 
 		List<Record> records = Record.fromJsonList(body);
 		for(Record record : records) {
-			table.write(record);
+			table.append(record);
+		}
+		
+		table.getSchema().evaluate();
+
+		return ResponseEntity.ok("{}");
+	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/tables/{id}/data/csv", method = RequestMethod.POST, produces = "application/json") // Create records in a table with a given id
+	public ResponseEntity<String> /* of List<Records> */ writeRecordsCsv(HttpSession session, @PathVariable String id, @RequestBody String body) {
+		Account acc = repository.getAccountForSession(session);
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
+		}
+
+		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
+		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
+
+		// Create records
+		List<Record> records = Record.fromCsvList(body);
+		for(Record record : records) {
+			table.append(record);
 		}
 		
 		table.getSchema().evaluate();
