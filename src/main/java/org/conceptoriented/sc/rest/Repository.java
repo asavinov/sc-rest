@@ -6,6 +6,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,55 +27,58 @@ public class Repository  {
 	protected String udfDir; 
 	protected File classDir;
 	
+	protected Duration accountTimeout = Duration.ofMinutes(60); // Maximum time after being accessed
+	protected Duration accountAge = Duration.ofDays(1); // Maximum time after being created
+	protected Instant lastCheck = Instant.now();
+	public void pruneAccounts() { // Delete all expired accounts
+		Instant now = Instant.now();
+		if(Duration.between(lastCheck, now).getSeconds() < 10) return; // Do not prune too frequently
+		List<Account> toDelete = new ArrayList<Account>();
+		for(Account acc : accounts) {
+			if(Duration.between(acc.getAccessTime(), now).getSeconds() > accountTimeout.getSeconds()) { // Not accessed long time
+				toDelete.add(acc);
+			}
+		}
+		for(Account acc : toDelete) accounts.remove(acc);
+	}
+
 	//
 	// All existing accounts. An account contains schemas, assets and parameters like name.
 	//
 	protected List<Account> accounts = new ArrayList<Account>();
-
+	
 	public Account getAccount(UUID id) {
+		pruneAccounts();
 		Optional<Account> ret = accounts
 				.stream()
 				.filter(acc -> acc.getId().equals(id))
 				.findAny();
-        if(ret.isPresent()) return ret.get();
-        else return null;
+        if(!ret.isPresent()) return null;
+        Account acc = ret.get();
+        acc.setAccessed();
+    	return acc;
 	}
 	public Account getAccountForName(String name) { // An account must have unique name
+		pruneAccounts();
 		Optional<Account> ret = accounts
 				.stream()
 				.filter(x -> x.getName().equals(name))
 				.findAny();
-        if(ret.isPresent()) return ret.get();
-        else return null;
+        if(!ret.isPresent()) return null;
+        Account acc = ret.get();
+        acc.setAccessed();
+    	return acc;
 	}
 	public Account getAccountForSession(HttpSession session) { // Find an account associated with this session
-
+		pruneAccounts();
 		Optional<Account> ret = accounts
 				.stream()
 				.filter(x -> x.getSession().equals(session.getId()))
 				.findAny();
-
-		//
-		// Found an account for this session
-		//
-		
-		// Option 1: check the expiration time and other constraints
-
-		// Option 2: use the account without any checks
-
-		if(ret.isPresent()) return ret.get();
-		
-		//
-		// No account for this session
-		//
-		
-		// Option 1: reject the request because it is necessary to first perform login and associate a session with an account/user
-		return null;
-		
-		// Option 2: automatically create a new (sample/test) account by associating it also with a kind of anonymous user
-		//Account acc = addSampleAccount();
-		//acc.setSession(session.getId());
-		//return acc;
+        if(!ret.isPresent()) return null;
+        Account acc = ret.get();
+        acc.setAccessed();
+    	return acc;
 	}
 	public Account addAccount(Account account) {
 		accounts.add(account);
@@ -214,6 +219,28 @@ class Account {
 		return id;
 	}
 
+	private final Instant creationTime;
+	public Instant getCreationTime() {
+		return creationTime;
+	}
+
+	private Instant accessTime;
+	public Instant getAccessTime() {
+		return accessTime;
+	}
+	public void setAccessed() {
+		this.accessTime = Instant.now();
+	}
+
+	private Instant changeTime;
+	public Instant getChangeTime() {
+		return changeTime;
+	}
+	public void setChanged() {
+		this.changeTime = Instant.now();
+		this.accessTime = this.changeTime;
+	}
+
 	// Session id (in future, there can be many sessions for one account)
 	private String session = "";
 	public String getSession() {
@@ -254,6 +281,10 @@ class Account {
 
 	public Account(Repository repository, String name) {
 		this.id = UUID.randomUUID();
+		this.creationTime = Instant.now();
+		this.accessTime = this.creationTime;
+		this.changeTime = this.creationTime;
+
 		this.name = name;
 		
 		this.repository = repository;
