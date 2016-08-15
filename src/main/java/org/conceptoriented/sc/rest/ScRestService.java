@@ -311,8 +311,9 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
+		table.getSchema().evaluate(); // We always evaluate before read
+
 		Range range = null; // All records
-		
 		String data = "";
 		for(Record record : table.read(range)) {
 			String data_elem = record.toJson();
@@ -334,8 +335,9 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
+		table.getSchema().evaluate(); // We always evaluate before read
+
 		Range range = null; // All records
-		
 		List<String> columns = table.getSchema().getColumns(table.getName()).stream().map(x -> x.getName()).collect(Collectors.<String>toList());
 		String header = "";
 		for(String col : columns) {
@@ -367,8 +369,6 @@ public class ScRestService {
 			table.append(record);
 		}
 		
-		table.getSchema().evaluate();
-
 		return ResponseEntity.ok("{}");
 	}
 	@CrossOrigin(origins = crossOrigins)
@@ -388,8 +388,6 @@ public class ScRestService {
 			table.append(record);
 		}
 		
-		table.getSchema().evaluate();
-
 		return ResponseEntity.ok("{}");
 	}
 
