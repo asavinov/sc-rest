@@ -84,43 +84,6 @@ public class Repository  {
 		accounts.add(account);
 		return account;
 	}
-	public Account addSampleAccount() {
-
-		// Account
-		Account account = new Account(this, "test@host.com");
-		accounts.add(account);
-
-		/*
-		URL[] classUrl = new URL[1];
-		try {
-			// We might also add more specific folder for this schema only (like subfolder with schema id)
-			classUrl[0] = classDir.toURI().toURL();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-		URLClassLoader classLoader = new URLClassLoader(classUrl);
-		account.setClassLoader(classLoader);
-		*/
-
-		// Schema
-		Schema schema = new Schema("My Schema");
-		this.addSchema(account, schema); // Here schema will get class loader from its account
-		
-		// Schema
-		Table t1 = schema.createTable("T");
-		t1.setMaxLength(3);
-		schema.createColumn("A", "T", "Double");
-		schema.createColumn("B", "T", "Double");
-		Column c13 = schema.createColumn("C", "T", "Double");
-        String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
-		c13.setDescriptor(d13.replace('`', '"'));
-		
-		schema.createTable("Table 2");
-		schema.createColumn("Column 21", "Table 2", "Double");
-		schema.createColumn("Column 22", "Table 2", "Double");
-		
-		return account;
-	}
 
 	//
 	// All existing schemas belonging to different users
@@ -210,6 +173,58 @@ public class Repository  {
 		classDir = new File(udfDir);
 	}
 
+	public static Schema getSampleSchema1(String name) {
+		if(name == null || name.isEmpty()) name = "My Schema";
+
+		Schema schema = new Schema(name);
+		
+		//
+		// Table
+		//
+		Table t1 = schema.createTable("My Table");
+		t1.setMaxLength(3);
+
+		// Columns
+		schema.createColumn("A", "My Table", "Double");
+		schema.createColumn("B", "My Table", "Double");
+		Column c13 = schema.createColumn("C", "My Table", "Double");
+		c13.setFormula("[A] + [B]");
+        //String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
+		//c13.setDescriptor(d13.replace('`', '"'));
+		
+		// Data
+        Record r = new Record();
+
+        r.set("A", 11.11); r.set("B", 22.22);
+        t1.append(r);
+
+        r.set("A", 33.33); r.set("B", 44.44);
+        t1.append(r);
+
+        r.set("A", 55.55); r.set("B", 66.66);
+        t1.append(r);
+
+		//
+		// Table 2
+		//
+		Table t2 = schema.createTable("My Table 2");
+
+		// Columns
+		Column c21 = schema.createColumn("D", "My Table 2", "Double");
+		Column c22 = schema.createColumn("E", "My Table 2", "Double");
+		c22.setFormula("[D] * 2.0");
+		
+		// Data
+        r = new Record();
+
+        r.set("D", 11.11);
+        t2.append(r);
+
+        r.set("D", 22.22);
+        t2.append(r);
+
+		return schema;
+	}
 }
 
 class Account {

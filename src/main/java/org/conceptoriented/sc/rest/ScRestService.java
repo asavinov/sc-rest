@@ -73,9 +73,13 @@ public class ScRestService {
 		if(acc == null) {
 			// Perform login
 
-			// Create an account and associate it with this session
-			acc = repository.addSampleAccount();
+			// Create a new account and associate it with this session (the old account if any will be garbage collected)
+			acc = new Account(repository, "test@host.com");
 			acc.setSession(session.getId());
+			repository.addAccount(acc);
+
+			Schema schema1 = Repository.getSampleSchema1("My Schema");
+			repository.addSchema(acc, schema1);
 		}
 		
 		// Already logged in.
