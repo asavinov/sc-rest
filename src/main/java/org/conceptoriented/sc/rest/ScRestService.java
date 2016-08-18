@@ -315,6 +315,7 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
+		table.markCleanAsNew();
 		table.getSchema().evaluate(); // We always evaluate before read
 
 		Range range = null; // All records
@@ -339,6 +340,7 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
+		table.markCleanAsNew();
 		table.getSchema().evaluate(); // We always evaluate before read
 
 		Range range = null; // All records

@@ -182,13 +182,15 @@ public class Repository  {
 		// Table
 		//
 		Table t1 = schema.createTable("My Table");
-		t1.setMaxLength(3);
+		t1.setMaxLength(10);
 
 		// Columns
-		schema.createColumn("A", "My Table", "Double");
-		schema.createColumn("B", "My Table", "Double");
-		Column c13 = schema.createColumn("C", "My Table", "Double");
-		c13.setFormula("[A] + [B]");
+		Column c;
+		c = schema.createColumn("A", "My Table", "Double");
+		c = schema.createColumn("B", "My Table", "Double");
+		c.setFormula("[A] + 1.0");
+		c = schema.createColumn("C", "My Table", "Double");
+		c.setFormula("[A] + [B]");
         //String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
 		//c13.setDescriptor(d13.replace('`', '"'));
 		
@@ -208,6 +210,7 @@ public class Repository  {
 		// Table 2
 		//
 		Table t2 = schema.createTable("My Table 2");
+		t2.setMaxLength(20);
 
 		// Columns
 		Column c21 = schema.createColumn("D", "My Table 2", "Double");
