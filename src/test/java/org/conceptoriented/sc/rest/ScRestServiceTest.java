@@ -56,7 +56,7 @@ public class ScRestServiceTest {
 
 		String result = template.getForObject(base.toString() + "/api/ping", String.class);
 
-		assertEquals("StreamCommandr", result);
+		assertEquals("DataCommandr", result);
 
 		result = template.getForObject(base.toString() + "ping", String.class);
 	}
@@ -83,15 +83,20 @@ public class ScRestServiceTest {
         ass.setName(fileName);
 
 		Repository repo = new Repository();
-        Account acc = repo.getAccountForName("test@host.com");
+		Account acc = new Account(repo, "test@host.com");
+		repo.addAccount(acc);
+		
+        acc = repo.getAccountForName("test@host.com");
         acc.setClassLoader(new UdfClassLoader(acc));
         repo.addAsset(acc, ass);
+		Schema schema1 = Repository.getSampleSchema1("My Schema");
+		repo.addSchema(acc, schema1);
 		
         // Define a column which uses a custom class
         Schema schema = repo.getSchemasForAccount(acc.getId()).get(0);
         
-        Column column = schema.getColumn("Table 2", "Column 21");
-        String descr = "{ `class`:`org.conceptoriented.sc.core.EvaluatorB`, `dependencies`:[`[Column 22]`] }";
+        Column column = schema.getColumn("My Table", "B");
+        String descr = "{ `class`:`org.conceptoriented.sc.core.EvaluatorB`, `dependencies`:[`[A]`] }";
         column.setDescriptor(descr.replace('`', '"'));
         
         // Evaluate schema - it has to load the class dynamically

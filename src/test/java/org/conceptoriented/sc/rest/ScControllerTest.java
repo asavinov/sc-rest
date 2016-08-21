@@ -48,7 +48,7 @@ public class ScControllerTest {
 		MvcResult result = this.mockMvc.perform(get("/api/ping").session(mockSession))
 				.andDo(print())
 				.andExpect(status().isOk())
-				//.andExpect(content().string("StreamCommandr"))
+				//.andExpect(content().string("DataCommandr"))
 				//.andExpect(jsonPath("$.content").value("Expected Value")),
 				//.andExpect(jsonPath(composerByName, "Robert Schumann").exists())
 				//.andExpect(jsonPath("$.composers[2]").exists())
@@ -56,7 +56,7 @@ public class ScControllerTest {
 		
 		String content = result.getResponse().getContentAsString();
 
-		assertEquals("StreamCommandr", content);
+		assertEquals("DataCommandr", content);
 	}
 
 

@@ -3,15 +3,18 @@ package org.conceptoriented.sc.rest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
@@ -42,7 +45,7 @@ public class ScRestService {
 	
 	private static final String crossOrigins = "*";
 
-	private static final Logger LOG = Logger.getLogger(ScRestService.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ScRestService.class.getName());
 
 	private final Repository repository;
     @Autowired
@@ -58,8 +61,8 @@ public class ScRestService {
 	@RequestMapping(method = RequestMethod.GET, value = "/ping", produces = "text/plain")
 	public ResponseEntity<String> ping(HttpServletRequest request /*HttpSession session*/) {
 		HttpSession session = request.getSession();
-		LOG.info("SUCCESS");
-		return ResponseEntity.ok("StreamCommandr");
+		LOG.debug("GET/ping: {}", "SUCCESS");
+		return ResponseEntity.ok("DataCommandr");
 	}
 
 	//
@@ -77,6 +80,7 @@ public class ScRestService {
 			acc = new Account(repository, "test@host.com");
 			acc.setSession(session.getId());
 			repository.addAccount(acc);
+			LOG.info("Method: {}, ACCOUNT CREATED. Account: {}", "GET/login", acc.getId());
 
 			Schema schema1 = Repository.getSampleSchema1("My Schema");
 			repository.addSchema(acc, schema1);
@@ -95,8 +99,10 @@ public class ScRestService {
 	public ResponseEntity<String> /* with List<Schema> */ getSchemas(HttpSession session) {
 		Account acc = repository.getAccountForSession(session);
 		if(acc == null) {
+			LOG.error("Method: {}, NOT_FOUND_IDENTITY, Session: {}", "GET/schemas", session.getId());
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "GET/schemas", acc.getId());
 
 		List<Schema> schemas = repository.getSchemasForAccount(acc.getId());
 
@@ -117,6 +123,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "POST/schemas", acc.getId());
 
 		Schema schema = Schema.fromJson(body);
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating schema.", ""));
@@ -135,6 +142,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}/{}, Account: {}", "GET/schemas", id, acc.getId());
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
@@ -148,6 +156,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}/{}, Account: {}", "PUT/schemas", id, acc.getId());
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
@@ -163,6 +172,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}/{}, Account: {}", "DELETE/schemas", id, acc.getId());
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
@@ -181,6 +191,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "GET/schemas/id/tables", acc.getId());
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
@@ -202,6 +213,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "POST/schemas/id/tables", acc.getId());
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
@@ -220,6 +232,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "GET/schemas/id/columns", acc.getId());
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
@@ -241,6 +254,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "POST/schemas/id/columns", acc.getId());
 
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
@@ -261,6 +275,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}/{}, Account: {}", "GET/tables", id, acc.getId());
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
@@ -274,6 +289,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}/{}, Account: {}", "PUT/tables", id, acc.getId());
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
@@ -291,6 +307,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}/{}, Account: {}", "DELETE/tables", id, acc.getId());
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
@@ -311,6 +328,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "GET/tables/id/data/json", acc.getId());
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
@@ -336,6 +354,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "GET/tables/id/data/csv", acc.getId());
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
@@ -366,6 +385,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "POST/tables/id/data/json", acc.getId());
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
@@ -384,6 +404,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "POST/tables/id/data/csv", acc.getId());
 
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
@@ -408,6 +429,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}/{}, Account: {}", "GET/columns", id, acc.getId());
 
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
 		if(column == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Column not found.", ""));
@@ -421,6 +443,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}/{}, Account: {}", "PUT/columns", id, acc.getId());
 
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
 		if(column == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Column not found.", ""));
@@ -438,6 +461,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}/{}, Account: {}", "DELETE/columns", id, acc.getId());
 
 		Column column = repository.getColumn(acc.getId(), UUID.fromString(id));
 		if(column == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Column not found.", ""));
@@ -462,6 +486,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "GET/assets", acc.getId());
 
 		List<Asset> assets = repository.getAssetsForAccount(acc.getId());
 		String jelems = "";
@@ -481,6 +506,7 @@ public class ScRestService {
 		if(acc == null) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
 		}
+		LOG.debug("Method: {}, Account: {}", "POST/assets", acc.getId());
 
 		List<Asset> assets = repository.getAssetsForAccount(acc.getId());
 		if(file.isEmpty()) {
