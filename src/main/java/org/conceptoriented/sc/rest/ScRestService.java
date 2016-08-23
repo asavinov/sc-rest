@@ -125,7 +125,13 @@ public class ScRestService {
 		}
 		LOG.debug("Method: {}, Account: {}", "POST/schemas", acc.getId());
 
-		Schema schema = Schema.fromJson(body);
+		Schema schema = null;
+		try {
+			schema = Schema.fromJson(body); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating schema.", e.getMessage()));
+		}
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating schema.", ""));
 
 		repository.addSchema(acc, schema);
@@ -161,7 +167,13 @@ public class ScRestService {
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
 
-		schema.updateFromJson(body);
+
+		try {
+			schema.updateFromJson(body); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error updating schema.", e.getMessage()));
+		}
 
 		return ResponseEntity.ok( schema.toJson() );
 	}
@@ -177,7 +189,12 @@ public class ScRestService {
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
 		
-		repository.deleteSchema(schema);
+		try {
+			repository.deleteSchema(schema); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting schema.", e.getMessage()));
+		}
 
 		return ResponseEntity.ok(null);
 	}
@@ -218,7 +235,13 @@ public class ScRestService {
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
 
-		Table table = schema.createTableFromJson(body);
+		Table table = null;
+		try {
+			table = schema.createTableFromJson(body); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating table.", e.getMessage()));
+		}
 
 		return ResponseEntity.ok( table.toJson() );
 	}
@@ -259,7 +282,13 @@ public class ScRestService {
 		Schema schema = repository.getSchema(UUID.fromString(id));
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
 
-		Column column = schema.createColumnFromJson(body);
+		Column column = null;
+		try {
+			column = schema.createColumnFromJson(body); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating column.", e.getMessage()));
+		}
 		
 		return ResponseEntity.ok( column.toJson() );
 	}
@@ -296,7 +325,12 @@ public class ScRestService {
 
 		Schema schema = table.getSchema();
 
-		schema.updateTableFromJson(body);
+		try {
+			schema.updateTableFromJson(body); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error updating table.", e.getMessage()));
+		}
 
 		return ResponseEntity.ok( table.toJson() );
 	}
@@ -314,7 +348,12 @@ public class ScRestService {
 
 		Schema schema = table.getSchema();
 
-		schema.deleteTable(id);
+		try {
+			schema.deleteTable(id); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting table.", e.getMessage()));
+		}
 
 		return ResponseEntity.ok(null);
 	}
@@ -333,8 +372,13 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
-		table.markCleanAsNew();
-		table.getSchema().evaluate(); // We always evaluate before read
+		try {
+			table.markCleanAsNew();
+			table.getSchema().evaluate(); // We always evaluate before read
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error evaluating data.", e.getMessage()));
+		}
 
 		Range range = null; // All records
 		String data = "";
@@ -359,9 +403,14 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
-		table.markCleanAsNew();
-		table.getSchema().evaluate(); // We always evaluate before read
-
+		try {
+			table.markCleanAsNew();
+			table.getSchema().evaluate(); // We always evaluate before read
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error evaluating data.", e.getMessage()));
+		}
+		
 		Range range = null; // All records
 		List<String> columns = table.getSchema().getColumns(table.getName()).stream().map(x -> x.getName()).collect(Collectors.<String>toList());
 		String header = "";
@@ -390,9 +439,14 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
-		List<Record> records = Record.fromJsonList(body);
-		for(Record record : records) {
-			table.append(record);
+		try {
+			List<Record> records = Record.fromJsonList(body);
+			for(Record record : records) {
+				table.append(record);
+			}
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error appending data.", e.getMessage()));
 		}
 		
 		return ResponseEntity.ok("{}");
@@ -409,10 +463,14 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
-		// Create records
-		List<Record> records = Record.fromCsvList(body);
-		for(Record record : records) {
-			table.append(record);
+		try {
+			List<Record> records = Record.fromCsvList(body);
+			for(Record record : records) {
+				table.append(record);
+			}
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error appending data.", e.getMessage()));
 		}
 		
 		return ResponseEntity.ok("{}");
@@ -450,7 +508,12 @@ public class ScRestService {
 
 		Schema schema = column.getSchema();
 
-		schema.updateColumnFromJson(body);
+		try {
+			schema.updateColumnFromJson(body); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error updating column.", e.getMessage()));
+		}
 
 		return ResponseEntity.ok( column.toJson() );
 	}
@@ -468,7 +531,12 @@ public class ScRestService {
 
 		Schema schema = column.getSchema();
 
-		schema.deleteColumn(id);
+		try {
+			schema.deleteColumn(id); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting column.", e.getMessage()));
+		}
 
 		return ResponseEntity.ok(null);
 	}
