@@ -491,6 +491,29 @@ public class ScRestService {
 		return ResponseEntity.ok("{}");
 	}
 
+
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.DELETE, produces = "application/json") // Delete data from the specified table
+	public ResponseEntity<String> deleteRecords(HttpSession session, @PathVariable String id) { 
+		Account acc = repository.getAccountForSession(session);
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
+		}
+		LOG.debug("Method: {}, Account: {}", "DELETE/tables/id/data", acc.getId());
+
+		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
+		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
+
+		try {
+			table.remove(); // Main operation
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting data.", e.getMessage()));
+		}
+
+		return ResponseEntity.ok(null);
+	}
+
 	//
 	// Columns
 	//
