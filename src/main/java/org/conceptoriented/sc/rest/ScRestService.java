@@ -129,6 +129,9 @@ public class ScRestService {
 		try {
 			schema = Schema.fromJson(body); // Main operation
 		}
+		catch(DcError e) {
+			return ResponseEntity.ok(e.toJson());
+		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating schema.", e.getMessage()));
 		}
@@ -170,6 +173,9 @@ public class ScRestService {
 
 		try {
 			schema.updateFromJson(body); // Main operation
+		}
+		catch(DcError e) {
+			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error updating schema.", e.getMessage()));
@@ -239,6 +245,9 @@ public class ScRestService {
 		try {
 			table = schema.createTableFromJson(body); // Main operation
 		}
+		catch(DcError e) {
+			return ResponseEntity.ok(e.toJson());
+		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating table.", e.getMessage()));
 		}
@@ -286,6 +295,9 @@ public class ScRestService {
 		try {
 			column = schema.createColumnFromJson(body); // Main operation
 		}
+		catch(DcError e) {
+			return ResponseEntity.ok(e.toJson());
+		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating column.", e.getMessage()));
 		}
@@ -327,6 +339,9 @@ public class ScRestService {
 
 		try {
 			schema.updateTableFromJson(body); // Main operation
+		}
+		catch(DcError e) {
+			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error updating table.", e.getMessage()));
@@ -510,6 +525,9 @@ public class ScRestService {
 
 		try {
 			schema.updateColumnFromJson(body); // Main operation
+		}
+		catch(DcError e) {
+			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error updating column.", e.getMessage()));
