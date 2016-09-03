@@ -2,7 +2,11 @@ package org.conceptoriented.sc.rest;
 
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -27,19 +31,40 @@ public class Repository  {
 	protected String udfDir; 
 	protected File classDir;
 	
-	protected Duration accountTimeout = Duration.ofMinutes(60); // Maximum time after being accessed
+	protected Duration accountTimeout = Duration.ofMinutes(1); // Maximum time after being accessed
 	protected Duration accountAge = Duration.ofDays(1); // Maximum time after being created
 	protected Instant lastCheck = Instant.now();
+
 	public void pruneAccounts() { // Delete all expired accounts
+
 		Instant now = Instant.now();
 		if(Duration.between(lastCheck, now).getSeconds() < 10) return; // Do not prune too frequently
 		List<Account> toDelete = new ArrayList<Account>();
 		for(Account acc : accounts) {
 			if(Duration.between(acc.getAccessTime(), now).getSeconds() > accountTimeout.getSeconds()) { // Not accessed long time
+				acc.setDeleted();
 				toDelete.add(acc);
 			}
 		}
-		for(Account acc : toDelete) accounts.remove(acc);
+
+		String fileName = "repo.log";
+		try (FileWriter fw = new FileWriter(fileName, true);
+				BufferedWriter bw = new BufferedWriter(fw);
+				PrintWriter out = new PrintWriter(bw)) {
+
+			// Write all pruned accounts to file
+			for(Account acc : toDelete) {
+				String jacc = acc.toJson();
+				out.print(jacc);
+				out.println(", ");
+			}
+		} catch (IOException e) {
+			;
+		} finally {
+			for(Account acc : toDelete) {
+				accounts.remove(acc);
+			}
+		}
 	}
 
 	//
@@ -259,6 +284,14 @@ class Account {
 		this.accessTime = this.changeTime;
 	}
 
+	private Instant deletionTime;
+	public Instant getDeletionTime() {
+		return deletionTime;
+	}
+	public void setDeleted() {
+		this.deletionTime = Instant.now();
+	}
+
 	// Session id (in future, there can be many sessions for one account)
 	private String session = "";
 	public String getSession() {
@@ -293,6 +326,52 @@ class Account {
 		return repository.getAssetsForAccount(this.getId());
 	}
 	
+	//
+	// Statistics
+	//
+	public int schemaCreateCount = 0;
+	public int schemaUpdateCount = 0;
+	public int schemaDeleteCount = 0;
+
+	public int tableCreateCount = 0;
+	public int tableUpdateCount = 0;
+	public int tableDeleteCount = 0;
+
+	public int tableUploadCount = 0;
+	public int tableEvaluateCount = 0;
+	public int tableEmptyCount = 0;
+
+	public int columnCreateCount = 0;
+	public int columnUpdateCount = 0;
+	public int columnDeleteCount = 0;
+
+	public String toJson() {
+		// Trick to avoid backslashing double quotes: use backticks and then replace it at the end 
+		String jid = "`id`: `" + this.getId() + "`";
+
+		String jname = "`name`: `" + this.getName() + "`";
+		
+		String jcreation_time = "`creationTime`: `" + this.getCreationTime() + "`";
+		String jaccess_time = "`accessTime`: `" + this.getAccessTime() + "`";
+		String jchange_time = "`changeTime`: `" + this.getChangeTime() + "`";
+		String jdeletion_time = "`deletionTime`: `" + this.getDeletionTime() + "`";
+
+		String jsession = "`session`: `" + this.getSession() + "`";
+
+		String json = jid + ", " + jname + ", " + jcreation_time + ", " + jaccess_time + ", " + jchange_time + ", " + jdeletion_time + ", " + jsession;
+
+		//
+		// Statistics
+		//
+		String jschemastats = "`schemaCreateCount`: " + this.schemaCreateCount + ", `schemaUpdateCount`: " + this.schemaUpdateCount + ", `schemaDeleteCount`: " + this.schemaDeleteCount;
+		String jtablestats = "`tableCreateCount`: " + this.tableCreateCount + ", `tableUpdateCount`: " + this.tableUpdateCount + ", `tableDeleteCount`: " + this.tableDeleteCount + ", `tableUploadCount`: " + this.tableUploadCount + ", `tableEvaluateCount`: " + this.tableEvaluateCount + ", `tableEmptyCount`: " + this.tableEmptyCount;
+		String jcolumntstats = "`columnCreateCount`: " + this.columnCreateCount + ", `columnUpdateCount`: " + this.columnUpdateCount + ", `columnDeleteCount`: " + this.columnDeleteCount;
+		
+		String jstats = jschemastats + ", " + jtablestats + ", " + jcolumntstats;
+
+		return ("{" + json + ", " + jstats + "}").replace('`', '"');
+	}
+
 	public Account(Repository repository) {
 		this(repository, "");
 	}

@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,12 +40,19 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import org.conceptoriented.sc.core.*;
 
+@CrossOrigin(/*origins = "http://dc.conceptoriented.com", */maxAge = 3600)
 @RestController
 @RequestMapping("/api")
 public class ScRestService {
 	
+	//
+	// Configure CORS. It will set http access control headers in response so that the browser can either accept or reject them 
+	//
 	private static final String crossOrigins = "*";
-
+	//private static final String crossOrigins = "http://localhost:8080";
+	//private static final String crossOrigins = "http://dc.conceptoriented.com:80";
+	//private static final String crossOrigins = "http://13.68.111.155:80"; // datacommandr.eastus2.cloudapp.azure.com
+	
 	private static final Logger LOG = LoggerFactory.getLogger(ScRestService.class.getName());
 
 	private final Repository repository;
@@ -66,16 +74,18 @@ public class ScRestService {
 	}
 
 	//
-	// Authentication
+	// Account, user, session, authentication
 	//
 
 	@CrossOrigin(origins = crossOrigins)
-	@RequestMapping(value = "/login", method = RequestMethod.GET) // Get session or token
-	public ResponseEntity<String> login(HttpSession session) {
-		Account acc = repository.getAccountForSession(session);
-		if(acc == null) {
-			// Perform login
+	@RequestMapping(value = "/account", method = RequestMethod.GET) // Get account object given credentials
+	public ResponseEntity<String> getAccount(HttpSession session) {
+		//
+		// We need to get credentials (user id) and then find an account object for this user
+		//
+		Account acc = repository.getAccountForSession(session); // Use session as user id
 
+		if(acc == null) { // No account for this session/user (first time access)
 			// Create a new account and associate it with this session (the old account if any will be garbage collected)
 			acc = new Account(repository, "test@host.com");
 			acc.setSession(session.getId());
@@ -86,8 +96,7 @@ public class ScRestService {
 			repository.addSchema(acc, schema1);
 		}
 		
-		// Already logged in.
-		return ResponseEntity.ok("{}");
+		return ResponseEntity.ok( acc.toJson() );
 	}
 
 	//
@@ -128,6 +137,7 @@ public class ScRestService {
 		Schema schema = null;
 		try {
 			schema = Schema.fromJson(body); // Main operation
+			acc.schemaCreateCount++;
 		}
 		catch(DcError e) {
 			return ResponseEntity.ok(e.toJson());
@@ -173,6 +183,7 @@ public class ScRestService {
 
 		try {
 			schema.updateFromJson(body); // Main operation
+			acc.schemaUpdateCount++;
 		}
 		catch(DcError e) {
 			return ResponseEntity.ok(e.toJson());
@@ -197,6 +208,7 @@ public class ScRestService {
 		
 		try {
 			repository.deleteSchema(schema); // Main operation
+			acc.schemaDeleteCount++;
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting schema.", e.getMessage()));
@@ -244,6 +256,7 @@ public class ScRestService {
 		Table table = null;
 		try {
 			table = schema.createTableFromJson(body); // Main operation
+			acc.tableCreateCount++;
 		}
 		catch(DcError e) {
 			return ResponseEntity.ok(e.toJson());
@@ -294,6 +307,7 @@ public class ScRestService {
 		Column column = null;
 		try {
 			column = schema.createColumnFromJson(body); // Main operation
+			acc.columnCreateCount++;
 		}
 		catch(DcError e) {
 			return ResponseEntity.ok(e.toJson());
@@ -339,6 +353,7 @@ public class ScRestService {
 
 		try {
 			schema.updateTableFromJson(body); // Main operation
+			acc.tableUpdateCount++;
 		}
 		catch(DcError e) {
 			return ResponseEntity.ok(e.toJson());
@@ -365,6 +380,7 @@ public class ScRestService {
 
 		try {
 			schema.deleteTable(id); // Main operation
+			acc.tableDeleteCount++;
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting table.", e.getMessage()));
@@ -390,6 +406,7 @@ public class ScRestService {
 		try {
 			table.markCleanAsNew();
 			table.getSchema().evaluate(); // We always evaluate before read
+			acc.tableEvaluateCount++;
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error evaluating data.", e.getMessage()));
@@ -421,6 +438,7 @@ public class ScRestService {
 		try {
 			table.markCleanAsNew();
 			table.getSchema().evaluate(); // We always evaluate before read
+			acc.tableEvaluateCount++;
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error evaluating data.", e.getMessage()));
@@ -459,6 +477,7 @@ public class ScRestService {
 			for(Record record : records) {
 				table.append(record);
 			}
+			acc.tableUploadCount++;
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error appending data.", e.getMessage()));
@@ -483,6 +502,7 @@ public class ScRestService {
 			for(Record record : records) {
 				table.append(record);
 			}
+			acc.tableUploadCount++;
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error appending data.", e.getMessage()));
@@ -506,6 +526,7 @@ public class ScRestService {
 
 		try {
 			table.remove(); // Main operation
+			acc.tableEmptyCount++;
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting data.", e.getMessage()));
@@ -548,6 +569,7 @@ public class ScRestService {
 
 		try {
 			schema.updateColumnFromJson(body); // Main operation
+			acc.columnUpdateCount++;
 		}
 		catch(DcError e) {
 			return ResponseEntity.ok(e.toJson());
@@ -574,6 +596,7 @@ public class ScRestService {
 
 		try {
 			schema.deleteColumn(id); // Main operation
+			acc.columnDeleteCount++;
 		}
 		catch(Exception e) {
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting column.", e.getMessage()));
