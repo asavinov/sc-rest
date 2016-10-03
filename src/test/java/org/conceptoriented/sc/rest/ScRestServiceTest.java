@@ -98,10 +98,9 @@ public class ScRestServiceTest {
         Column column = schema.getColumn("My Table", "B");
         String descr = "{ `class`:`org.conceptoriented.sc.core.EvaluatorB`, `dependencies`:[`[A]`] }";
         column.setDescriptor(descr.replace('`', '"'));
-        
+
         // Evaluate schema - it has to load the class dynamically
         column.evaluate();
-        
-	}
+    }
 
 }

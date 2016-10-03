@@ -318,7 +318,55 @@ public class ScRestService {
 		
 		return ResponseEntity.ok( column.toJson() );
 	}
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/schemas/{id}/columns/statuses", method = RequestMethod.GET, produces = "application/json") // Read status of all columns in the schema
+	public ResponseEntity<String> /* with List<DcError> */ getStatuses(HttpSession session, @PathVariable String id) {
+		Account acc = repository.getAccountForSession(session);
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
+		}
+		LOG.debug("Method: {}, Account: {}", "GET/schemas/id/columns/statuses", acc.getId());
+
+		Schema schema = repository.getSchema(UUID.fromString(id));
+		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
+
+		String jelems = "";
+		for(Column elem : schema.getColumns()) {
+			String jelem = elem.getStatus().toJson();
+			jelems += "\"" + elem.getId() + "\"" + ": " + jelem + ", ";
+		}
+		if(jelems.length() > 2) {
+			jelems = jelems.substring(0, jelems.length()-2);
+		}
+		return ResponseEntity.ok( "{" + jelems + "}" );
+	}
 	
+	// Operations of one schema 
+
+	@CrossOrigin(origins = crossOrigins)
+	@RequestMapping(value = "/schemas/{id}/evaluate", method = RequestMethod.GET, produces = "application/json") // Evaluate data in the schema
+	public ResponseEntity<String> /* DcError */ evaluate(HttpSession session, @PathVariable String id) {
+		Account acc = repository.getAccountForSession(session);
+		if(acc == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DcError.error(DcErrorCode.NOT_FOUND_IDENTITY, "Session: "+session));
+		}
+		LOG.debug("Method: {}, Account: {}", "GET/schemas/id/evaluate", acc.getId());
+
+		Schema schema = repository.getSchema(UUID.fromString(id));
+		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
+
+		try {
+			schema.getTables().forEach(x -> x.markCleanAsNew()); // Mark all columns in the schema as new (dirty, non-evaluated)
+			schema.evaluate(); // Evaluate
+			acc.schemaEvaluateCount++;
+		}
+		catch(Exception e) {
+			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error evaluating data.", e.getMessage()));
+		}
+
+		return ResponseEntity.ok( "{ \"data\": [] }" );
+	}
+
 	//
 	// Tables
 	//
@@ -403,15 +451,6 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
-		try {
-			table.markCleanAsNew();
-			table.getSchema().evaluate(); // We always evaluate before read
-			acc.tableEvaluateCount++;
-		}
-		catch(Exception e) {
-			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error evaluating data.", e.getMessage()));
-		}
-
 		Range range = null; // All records
 		String data = "";
 		for(Record record : table.read(range)) {
@@ -435,15 +474,6 @@ public class ScRestService {
 		Table table = repository.getTable(acc.getId(), UUID.fromString(id));
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
-		try {
-			table.markCleanAsNew();
-			table.getSchema().evaluate(); // We always evaluate before read
-			acc.tableEvaluateCount++;
-		}
-		catch(Exception e) {
-			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error evaluating data.", e.getMessage()));
-		}
-		
 		Range range = null; // All records
 		List<String> columns = table.getSchema().getColumns(table.getName()).stream().map(x -> x.getName()).collect(Collectors.<String>toList());
 		String header = "";

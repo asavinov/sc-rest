@@ -332,6 +332,7 @@ class Account {
 	public int schemaCreateCount = 0;
 	public int schemaUpdateCount = 0;
 	public int schemaDeleteCount = 0;
+	public int schemaEvaluateCount = 0;
 
 	public int tableCreateCount = 0;
 	public int tableUpdateCount = 0;
@@ -363,7 +364,7 @@ class Account {
 		//
 		// Statistics
 		//
-		String jschemastats = "`schemaCreateCount`: " + this.schemaCreateCount + ", `schemaUpdateCount`: " + this.schemaUpdateCount + ", `schemaDeleteCount`: " + this.schemaDeleteCount;
+		String jschemastats = "`schemaCreateCount`: " + this.schemaCreateCount + ", `schemaUpdateCount`: " + this.schemaUpdateCount + ", `schemaDeleteCount`: " + this.schemaDeleteCount + ", `schemaEvaluateCount`: " + this.schemaEvaluateCount;
 		String jtablestats = "`tableCreateCount`: " + this.tableCreateCount + ", `tableUpdateCount`: " + this.tableUpdateCount + ", `tableDeleteCount`: " + this.tableDeleteCount + ", `tableUploadCount`: " + this.tableUploadCount + ", `tableEvaluateCount`: " + this.tableEvaluateCount + ", `tableEmptyCount`: " + this.tableEmptyCount;
 		String jcolumntstats = "`columnCreateCount`: " + this.columnCreateCount + ", `columnUpdateCount`: " + this.columnUpdateCount + ", `columnDeleteCount`: " + this.columnDeleteCount;
 		
