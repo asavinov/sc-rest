@@ -241,6 +241,8 @@ public class Repository  {
 		Column c21 = schema.createColumn("D", "My Table 2", "Double");
 		Column c22 = schema.createColumn("E", "My Table 2", "Double");
 		c22.setFormula("[D] * 2.0");
+		Column c23 = schema.createColumn("F", "My Table 2", "My Table");
+		c23.setFormula("{ [A]=[D] }");
 		
 		// Data
         r = new Record();
