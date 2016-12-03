@@ -93,6 +93,7 @@ public class ScRestService {
 			LOG.info("Method: {}, ACCOUNT CREATED. Account: {}", "GET/login", acc.getId());
 
 			Schema schema1 = Repository.getSampleSchema1("My Schema");
+			schema1.translate();
 			repository.addSchema(acc, schema1);
 		}
 		
@@ -357,6 +358,7 @@ public class ScRestService {
 
 		try {
 			schema.getTables().forEach(x -> x.markCleanAsNew()); // Mark all columns in the schema as new (dirty, non-evaluated)
+			schema.translate();
 			schema.evaluate(); // Evaluate
 			acc.schemaEvaluateCount++;
 		}
@@ -599,6 +601,7 @@ public class ScRestService {
 
 		try {
 			schema.updateColumnFromJson(body); // Main operation
+			column.translate();
 			acc.columnUpdateCount++;
 		}
 		catch(DcError e) {
