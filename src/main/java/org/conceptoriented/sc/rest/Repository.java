@@ -218,6 +218,11 @@ public class Repository  {
 		c.setFormula("[A] + [B]");
         //String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
 		//c13.setDescriptor(d13.replace('`', '"'));
+		c = schema.createColumn("AA", "My Table", "Double");
+		c.setFormula("[A]");
+		c.setAccuformula("output + [E] * 10.0");
+		c.setAccutable("My Table 2");
+		c.setAccupath("[GG]");
 		
 		// Data
         Record r = new Record();
@@ -241,7 +246,7 @@ public class Repository  {
 		Column c21 = schema.createColumn("D", "My Table 2", "Double");
 		Column c22 = schema.createColumn("E", "My Table 2", "Double");
 		c22.setFormula("[D] * 2.0");
-		Column c23 = schema.createColumn("F", "My Table 2", "My Table");
+		Column c23 = schema.createColumn("GG", "My Table 2", "My Table");
 		c23.setFormula("{ [A]=[D] }");
 		
 		// Data
