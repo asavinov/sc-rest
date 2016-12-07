@@ -601,7 +601,7 @@ public class ScRestService {
 
 		try {
 			schema.updateColumnFromJson(body); // Main operation
-			column.translate();
+			schema.translate();
 			acc.columnUpdateCount++;
 		}
 		catch(DcError e) {
