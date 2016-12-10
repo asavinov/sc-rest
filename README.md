@@ -19,7 +19,7 @@ The following steps have to be performed:
 
 # Change Log
 
-A list of changes for each release can be found in other projects.
+A list of changes for each release can be found in the UI project.
 
 * v0.2.0 (2016-12-10)
 * v0.1.0 (2016-09-05)
