@@ -308,6 +308,7 @@ public class ScRestService {
 		Column column = null;
 		try {
 			column = schema.createColumnFromJson(body); // Main operation
+			schema.translate();
 			acc.columnCreateCount++;
 		}
 		catch(DcError e) {
@@ -629,6 +630,7 @@ public class ScRestService {
 
 		try {
 			schema.deleteColumn(id); // Main operation
+			schema.translate();
 			acc.columnDeleteCount++;
 		}
 		catch(Exception e) {
