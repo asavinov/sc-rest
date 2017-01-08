@@ -2,6 +2,8 @@ package org.conceptoriented.sc.rest;
 
 import org.springframework.stereotype.Service;
 
+import com.google.common.io.Files;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -198,7 +200,7 @@ public class Repository  {
 		classDir = new File(udfDir);
 	}
 
-	public static Schema getSampleSchema1(String name) {
+	public static Schema buildSampleSchema1(String name) {
 		if(name == null || name.isEmpty()) name = "My Schema";
 
 		Schema schema = new Schema(name);
@@ -260,6 +262,46 @@ public class Repository  {
 
 		return schema;
 	}
+
+	public static Schema buildSampleSchema2(String name) {
+		if(name == null || name.isEmpty()) name = "Sales";
+
+		Schema schema = new Schema(name);
+
+		// Tables
+
+		String path1 = "src/test/resources/example1/Order Details.csv";
+        Table table1 = schema.createFromCsv(path1, true);
+
+        String path2 = "src/test/resources/example1/Products.csv";
+        Table table2 = schema.createFromCsv(path2, true);
+
+        Table table3 = schema.createTable("Orders");
+        schema.createColumn("ID", "Orders", "Double");
+
+		// Columns
+
+        Column c11 = schema.createColumn("Product", "Order Details", "Products");
+		c11.setFormula("{ [ID] = [Product ID] }");
+        Column c12 = schema.createColumn("Order", "Order Details", "Orders");
+		c12.setFormula("{ [ID] = [Order ID] }");
+
+		Column c;
+		c = schema.createColumn("Total Amount", "Products", "Double");
+		c.setFormula("0.0");
+		c.setAccuformula("output + [Quantity] * [Unit Price]");
+		c.setAccutable("Order Details");
+		c.setAccupath("[Product]");
+
+		c = schema.createColumn("Total Amount", "Orders", "Double");
+		c.setFormula("0.0");
+		c.setAccuformula("output + [Quantity] * [Unit Price]");
+		c.setAccutable("Order Details");
+		c.setAccupath("[Order]");
+
+		return schema;
+	}
+
 }
 
 class Account {

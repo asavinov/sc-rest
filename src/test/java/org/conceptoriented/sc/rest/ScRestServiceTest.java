@@ -11,10 +11,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,31 +21,32 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import org.conceptoriented.sc.core.*;
-import org.conceptoriented.sc.rest.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
-@WebAppConfiguration
-@IntegrationTest("server.port:0")
-@ActiveProfiles("Win")
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+//@ActiveProfiles("Win")
 public class ScRestServiceTest {
 
 	@Value("${local.server.port}")
-	private int port;
+	private String port;
 
 	private URL base;
-	private RestTemplate template;
 
+    @Autowired
+    private TestRestTemplate template;
+    
 	@Before
 	public void setUp() throws Exception {
 		this.base = new URL("http://localhost:" + port + "/");
-		template = new TestRestTemplate();
 	}
 
 	@Test
@@ -89,7 +88,7 @@ public class ScRestServiceTest {
         acc = repo.getAccountForName("test@host.com");
         acc.setClassLoader(new UdfClassLoader(acc));
         repo.addAsset(acc, ass);
-		Schema schema1 = Repository.getSampleSchema1("My Schema");
+		Schema schema1 = Repository.buildSampleSchema1("My Schema");
 		repo.addSchema(acc, schema1);
 		
         // Define a column which uses a custom class
@@ -102,5 +101,14 @@ public class ScRestServiceTest {
         // Evaluate schema - it has to load the class dynamically
         column.evaluate();
     }
+
+	@Test
+	public void testRepository() throws Exception {
+
+		Schema schema2 = Repository.buildSampleSchema2("Sales");
+		
+		schema2 = null;
+
+	}
 
 }

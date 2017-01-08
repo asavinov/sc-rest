@@ -92,9 +92,14 @@ public class ScRestService {
 			repository.addAccount(acc);
 			LOG.info("Method: {}, ACCOUNT CREATED. Account: {}", "GET/login", acc.getId());
 
-			Schema schema1 = Repository.getSampleSchema1("My Schema");
+			Schema schema1 = Repository.buildSampleSchema1("My Schema");
 			schema1.translate();
 			repository.addSchema(acc, schema1);
+
+			Schema schema2 = Repository.buildSampleSchema2("Sales");
+			schema2.translate();
+			repository.addSchema(acc, schema2);
+
 		}
 		
 		return ResponseEntity.ok( acc.toJson() );
@@ -507,9 +512,7 @@ public class ScRestService {
 
 		try {
 			List<Record> records = Record.fromJsonList(body);
-			for(Record record : records) {
-				table.append(record);
-			}
+			table.append(records, null);
 			acc.tableUploadCount++;
 		}
 		catch(Exception e) {
@@ -532,9 +535,7 @@ public class ScRestService {
 
 		try {
 			List<Record> records = Record.fromCsvList(body);
-			for(Record record : records) {
-				table.append(record);
-			}
+			table.append(records, null);
 			acc.tableUploadCount++;
 		}
 		catch(Exception e) {

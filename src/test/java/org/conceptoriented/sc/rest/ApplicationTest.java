@@ -9,19 +9,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.OutputCapture;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-//@EnableAutoConfiguration
-@SpringApplicationConfiguration(classes = Application.class)
-@WebAppConfiguration
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+//@ActiveProfiles("Win")
 public class ApplicationTest {
-
-	@Rule
-	public OutputCapture outputCapture = new OutputCapture();
 
 	private String profiles;
 
@@ -48,4 +45,5 @@ public class ApplicationTest {
 
 		//assertTrue(output.contains("ActiveProfile: Win"));
 	}
+
 }
