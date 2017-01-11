@@ -146,9 +146,11 @@ public class ScRestService {
 			acc.schemaCreateCount++;
 		}
 		catch(DcError e) {
+			LOG.error("DcError",  e);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating schema.", e.getMessage()));
 		}
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating schema.", ""));
@@ -192,9 +194,11 @@ public class ScRestService {
 			acc.schemaUpdateCount++;
 		}
 		catch(DcError e) {
+			LOG.error("DcError",  e);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error updating schema.", e.getMessage()));
 		}
 
@@ -217,6 +221,7 @@ public class ScRestService {
 			acc.schemaDeleteCount++;
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting schema.", e.getMessage()));
 		}
 
@@ -265,9 +270,11 @@ public class ScRestService {
 			acc.tableCreateCount++;
 		}
 		catch(DcError e) {
+			LOG.error("DcError",  e);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating table.", e.getMessage()));
 		}
 
@@ -317,9 +324,11 @@ public class ScRestService {
 			acc.columnCreateCount++;
 		}
 		catch(DcError e) {
+			LOG.error("DcError",  e);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error creating column.", e.getMessage()));
 		}
 		
@@ -369,6 +378,7 @@ public class ScRestService {
 			acc.schemaEvaluateCount++;
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error evaluating data.", e.getMessage()));
 		}
 
@@ -412,9 +422,11 @@ public class ScRestService {
 			acc.tableUpdateCount++;
 		}
 		catch(DcError e) {
+			LOG.error("DcError",  e);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error updating table.", e.getMessage()));
 		}
 
@@ -439,6 +451,7 @@ public class ScRestService {
 			acc.tableDeleteCount++;
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting table.", e.getMessage()));
 		}
 
@@ -516,6 +529,7 @@ public class ScRestService {
 			acc.tableUploadCount++;
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error appending data.", e.getMessage()));
 		}
 		
@@ -539,6 +553,7 @@ public class ScRestService {
 			acc.tableUploadCount++;
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error appending data.", e.getMessage()));
 		}
 		
@@ -563,6 +578,7 @@ public class ScRestService {
 			acc.tableEmptyCount++;
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting data.", e.getMessage()));
 		}
 
@@ -607,9 +623,11 @@ public class ScRestService {
 			acc.columnUpdateCount++;
 		}
 		catch(DcError e) {
+			LOG.error("DcError",  e);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error updating column.", e.getMessage()));
 		}
 
@@ -635,6 +653,7 @@ public class ScRestService {
 			acc.columnDeleteCount++;
 		}
 		catch(Exception e) {
+			LOG.error("Exception",  e);
 			return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Error deleting column.", e.getMessage()));
 		}
 
@@ -685,8 +704,9 @@ public class ScRestService {
 		try {
 			file.getInputStream().read(data);
 			return ResponseEntity.ok("{}");
-		} catch (IOException e1) {
-			e1.printStackTrace();
+		} 
+		catch (IOException e) {
+			LOG.error("Exception",  e);
 		}
 		
 		// We actually update or create only one asset per account
