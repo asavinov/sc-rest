@@ -222,7 +222,7 @@ public class Repository  {
 		//c13.setDescriptor(d13.replace('`', '"'));
 		c = schema.createColumn("AA", "My Table", "Double");
 		c.setFormula("[A]");
-		c.setAccuformula("output + [E] * 10.0");
+		c.setAccuformula("out + [E] * 10.0");
 		c.setAccutable("My Table 2");
 		c.setAccupath("[GG]");
 		
@@ -289,13 +289,13 @@ public class Repository  {
 		Column c;
 		c = schema.createColumn("Total Amount", "Products", "Double");
 		c.setFormula("0.0");
-		c.setAccuformula("output + [Quantity] * [Unit Price]");
+		c.setAccuformula("out + [Quantity] * [Unit Price]");
 		c.setAccutable("Order Details");
 		c.setAccupath("[Product]");
 
 		c = schema.createColumn("Total Amount", "Orders", "Double");
 		c.setFormula("0.0");
-		c.setAccuformula("output + [Quantity] * [Unit Price]");
+		c.setAccuformula("out + [Quantity] * [Unit Price]");
 		c.setAccutable("Order Details");
 		c.setAccupath("[Order]");
 
