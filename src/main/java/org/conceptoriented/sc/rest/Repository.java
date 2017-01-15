@@ -270,7 +270,7 @@ public class Repository  {
 
 		// Tables
 
-		String path1 = "src/test/resources/example1/Order Details.csv";
+		String path1 = "src/test/resources/example1/OrderItems.csv";
         Table table1 = schema.createFromCsv(path1, true);
 
         String path2 = "src/test/resources/example1/Products.csv";
@@ -281,22 +281,22 @@ public class Repository  {
 
 		// Columns
 
-        Column c11 = schema.createColumn("Product", "Order Details", "Products");
+        Column c11 = schema.createColumn("Product", "OrderItems", "Products");
 		c11.setFormula("{ [ID] = [Product ID] }");
-        Column c12 = schema.createColumn("Order", "Order Details", "Orders");
+        Column c12 = schema.createColumn("Order", "OrderItems", "Orders");
 		c12.setFormula("{ [ID] = [Order ID] }");
 
 		Column c;
 		c = schema.createColumn("Total Amount", "Products", "Double");
 		c.setFormula("0.0");
 		c.setAccuformula("out + [Quantity] * [Unit Price]");
-		c.setAccutable("Order Details");
+		c.setAccutable("OrderItems");
 		c.setAccupath("[Product]");
 
 		c = schema.createColumn("Total Amount", "Orders", "Double");
 		c.setFormula("0.0");
 		c.setAccuformula("out + [Quantity] * [Unit Price]");
-		c.setAccutable("Order Details");
+		c.setAccutable("OrderItems");
 		c.setAccupath("[Order]");
 
 		return schema;
