@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -40,18 +38,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import org.conceptoriented.sc.core.*;
 
-@CrossOrigin(/*origins = "http://dc.conceptoriented.com", */maxAge = 3600)
 @RestController
 @RequestMapping("/api")
 public class ScRestService {
-	
-	//
-	// Configure CORS. It will set http access control headers in response so that the browser can either accept or reject them 
-	//
-	private static final String crossOrigins = "*";
-	//private static final String crossOrigins = "http://localhost:8080";
-	//private static final String crossOrigins = "http://dc.conceptoriented.com:80";
-	//private static final String crossOrigins = "http://13.68.111.155:80"; // datacommandr.eastus2.cloudapp.azure.com
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ScRestService.class.getName());
 
@@ -65,7 +54,6 @@ public class ScRestService {
 	// Test
 	//
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(method = RequestMethod.GET, value = "/ping", produces = "text/plain")
 	public ResponseEntity<String> ping(HttpServletRequest request /*HttpSession session*/) {
 		HttpSession session = request.getSession();
@@ -77,7 +65,6 @@ public class ScRestService {
 	// Account, user, session, authentication
 	//
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/account", method = RequestMethod.GET) // Get account object given credentials
 	public ResponseEntity<String> getAccount(HttpSession session) {
 		//
@@ -109,7 +96,6 @@ public class ScRestService {
 	// Schemas and their elements
 	//
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas", method = RequestMethod.GET) // Get all schemas (of an account)
 	public ResponseEntity<String> /* with List<Schema> */ getSchemas(HttpSession session) {
 		Account acc = repository.getAccountForSession(session);
@@ -131,7 +117,6 @@ public class ScRestService {
 		}
 		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas", method = RequestMethod.POST, produces = "application/json") // Create one (or several) schemas
 	public ResponseEntity<String> /* of List<Schema> */ createSchemas(HttpSession session, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
@@ -162,7 +147,6 @@ public class ScRestService {
 
 	// Operations with one schema
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.GET, produces = "application/json") // Get one schema with the specified id
 	public ResponseEntity<String> /* of Schema */ getSchema(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
@@ -176,7 +160,6 @@ public class ScRestService {
 
 		return ResponseEntity.ok( schema.toJson() );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing schema
 	public ResponseEntity<String> /* of Schema */ updateSchema(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
@@ -204,7 +187,6 @@ public class ScRestService {
 
 		return ResponseEntity.ok( schema.toJson() );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified schema (and all its elements)
 	public ResponseEntity<String> deleteSchema(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
@@ -230,7 +212,6 @@ public class ScRestService {
 	
 	// Tables of one schema
 	
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/tables", method = RequestMethod.GET, produces = "application/json") // Read all tables in the schema
 	public ResponseEntity<String> /* of List<Table> */ getTables(HttpSession session, @PathVariable String id, HttpServletRequest req) {
 		Account acc = repository.getAccountForSession(session);
@@ -252,7 +233,6 @@ public class ScRestService {
 		}
 		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/tables", method = RequestMethod.POST, produces = "application/json") // Create one (or several) tables. Return 201 Status Code and (optionally) the newly created id.
 	public ResponseEntity<String> /* of List<Table> */ createTables(HttpSession session, @PathVariable String id, @RequestBody String body) {
 		Account acc = repository.getAccountForSession(session);
@@ -283,7 +263,6 @@ public class ScRestService {
 	
 	// Columns of one schema 
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/columns", method = RequestMethod.GET, produces = "application/json") // Read all columns in the schema
 	public ResponseEntity<String> /* with List<Column> */ getColumns(HttpSession session, @PathVariable String id) {
 		Account acc = repository.getAccountForSession(session);
@@ -305,7 +284,6 @@ public class ScRestService {
 		}
 		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/columns", method = RequestMethod.POST, produces = "application/json") // Create one (or several) several columns
 	public ResponseEntity<String> /* of List<Column> */ createColumns(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
@@ -334,7 +312,6 @@ public class ScRestService {
 		
 		return ResponseEntity.ok( column.toJson() );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/columns/statuses", method = RequestMethod.GET, produces = "application/json") // Read status of all columns in the schema
 	public ResponseEntity<String> /* with List<DcError> */ getStatuses(HttpSession session, @PathVariable String id) {
 		Account acc = repository.getAccountForSession(session);
@@ -359,7 +336,6 @@ public class ScRestService {
 	
 	// Operations of one schema 
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/schemas/{id}/evaluate", method = RequestMethod.GET, produces = "application/json") // Evaluate data in the schema
 	public ResponseEntity<String> /* DcError */ evaluate(HttpSession session, @PathVariable String id) {
 		Account acc = repository.getAccountForSession(session);
@@ -389,7 +365,6 @@ public class ScRestService {
 	// Tables
 	//
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.GET, produces = "application/json") // Read one table with the specified id
 	public ResponseEntity<String> /* of Table */ getTable(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
@@ -403,7 +378,6 @@ public class ScRestService {
 
 		return ResponseEntity.ok( table.toJson() );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing table
 	public ResponseEntity<String> /* of Table */ updateTable(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
@@ -432,7 +406,6 @@ public class ScRestService {
 
 		return ResponseEntity.ok( table.toJson() );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
 	public ResponseEntity<String> deleteTable(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
@@ -460,7 +433,6 @@ public class ScRestService {
 
 	// Records from one table
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data/json", method = RequestMethod.GET, produces = "application/json") // Read records from one table with the specified id
 	public ResponseEntity<String> /* of List<Records> */ getRecordsJson(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
@@ -483,7 +455,6 @@ public class ScRestService {
 		}
 		return ResponseEntity.ok( "{\"data\": [" + data + "]}" );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data/csv", method = RequestMethod.GET, produces = "application/json") // Read records from one table with the specified id
 	public ResponseEntity<String> /* of List<Records> */ getRecordsCsv(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
@@ -511,7 +482,6 @@ public class ScRestService {
 		}
 		return ResponseEntity.ok( "" + header +  data + "" );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data/json", method = RequestMethod.POST, produces = "application/json") // Create records in a table with a given id
 	public ResponseEntity<String> /* of List<Records> */ writeRecordsJson(HttpSession session, @PathVariable String id, @RequestBody String body) {
 		Account acc = repository.getAccountForSession(session);
@@ -535,7 +505,6 @@ public class ScRestService {
 		
 		return ResponseEntity.ok("{}");
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data/csv", method = RequestMethod.POST, produces = "application/json") // Create records in a table with a given id
 	public ResponseEntity<String> /* of List<Records> */ writeRecordsCsv(HttpSession session, @PathVariable String id, @RequestBody String body) {
 		Account acc = repository.getAccountForSession(session);
@@ -561,7 +530,6 @@ public class ScRestService {
 	}
 
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/tables/{id}/data", method = RequestMethod.DELETE, produces = "application/json") // Delete data from the specified table
 	public ResponseEntity<String> deleteRecords(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
@@ -589,7 +557,6 @@ public class ScRestService {
 	// Columns
 	//
 	
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.GET, produces = "application/json") // Read one column with the specified id
 	public ResponseEntity<String> /* of Column */ getColumn(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
@@ -603,7 +570,6 @@ public class ScRestService {
 
 		return ResponseEntity.ok( column.toJson() );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.PUT, produces = "application/json") // Update an existing column
 	public ResponseEntity<String> /* of Column */ updateColumn(HttpSession session, @PathVariable String id, @RequestBody String body) { 
 		Account acc = repository.getAccountForSession(session);
@@ -633,7 +599,6 @@ public class ScRestService {
 
 		return ResponseEntity.ok( column.toJson() );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/columns/{id}", method = RequestMethod.DELETE, produces = "application/json") // Delete the specified table (and its columns)
 	public ResponseEntity<String> deleteColumn(HttpSession session, @PathVariable String id) { 
 		Account acc = repository.getAccountForSession(session);
@@ -666,7 +631,6 @@ public class ScRestService {
 
 	// Many assets
 
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/assets", method = RequestMethod.GET, produces = "application/json") // Read all assets
 	public ResponseEntity<String> /* with List<Asset> */ getAssets(HttpSession session) { 
 		Account acc = repository.getAccountForSession(session);
@@ -686,7 +650,6 @@ public class ScRestService {
 		}
 		return ResponseEntity.ok( "{\"data\": [" + jelems + "]}" );
 	}
-	@CrossOrigin(origins = crossOrigins)
 	@RequestMapping(value = "/assets", method = RequestMethod.POST, produces = "application/json") // Create one (or several) assets
 	public ResponseEntity<String> /* of List<Asset> */ createAssets(HttpSession session, @RequestParam("file") MultipartFile file) { 
 		Account acc = repository.getAccountForSession(session);
