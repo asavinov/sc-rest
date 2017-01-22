@@ -47,8 +47,7 @@ public class Application {
 	private static final Logger LOG = LoggerFactory.getLogger(Application.class.getName());
 
 	// Default list of allowed hosts
-	public static String origins = "http://localhost:8080,http://conceptoriented.com:80,http://dc.conceptoriented.com:80";
-	// datacommandr.eastus2.cloudapp.azure.com
+	public static String origins = "http://localhost,http://localhost:8080,http://dc.conceptoriented.com,http://conceptoriented.com,http://datacommandr.eastus2.cloudapp.azure.com";
 
 	public static void main(String[] args) {
 		SpringApplication app = new SpringApplication(Application.class);
@@ -101,6 +100,8 @@ public class Application {
             	registry
                 	.addMapping("/api/**")
                 	.allowedOrigins(origins.split(","))
+                	.allowedMethods("GET", "PUT", "POST", "DELETE", "OPTIONS") // Note that not all methods are included by default
+                	.allowedHeaders("*")
                 	.allowCredentials(true)
                 	.maxAge(3600);
                 	;
@@ -110,9 +111,9 @@ public class Application {
 
 }
 
-/*
 // Here we configure a filter for each request
-// See also whitelisting multiple origins using intercepter: http://dontpanic.42.nl/2015/04/cors-with-spring-mvc.html
+// See also white-listing multiple origins using intercepter: http://dontpanic.42.nl/2015/04/cors-with-spring-mvc.html
+/*
 @Component
 class SimpleCorsFilter implements Filter {
 	// Here we only provide the necessary headers for the browser to decide what to filter but do not do our own filtering
@@ -122,7 +123,7 @@ class SimpleCorsFilter implements Filter {
     	HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
         
-        System.out.println( "Origin: " + request.getHeader("Origin") );
+        System.out.println( ">>>>>>> Origin: " + request.getHeader("Origin") );
         // 'http://localhost:8080' if the request is from browser 
         // 'bla2.com' if the request is from curl --header "Origin: bla2.com" 
         
@@ -136,7 +137,7 @@ class SimpleCorsFilter implements Filter {
         // But how it is done in Spring Boot using annotations?
 
         // What methods are allowed
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH");
+        response.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS, PATCH");
         //response.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS, DELETE");
 
         response.setHeader("Access-Control-Allow-Credentials", "true");

@@ -79,9 +79,9 @@ public class ScRestService {
 			repository.addAccount(acc);
 			LOG.info("Method: {}, ACCOUNT CREATED. Account: {}", "GET/login", acc.getId());
 
-			Schema schema1 = Repository.buildSampleSchema1("My Schema");
-			schema1.translate();
-			repository.addSchema(acc, schema1);
+			//Schema schema1 = Repository.buildSampleSchema1("My Schema");
+			//schema1.translate();
+			//repository.addSchema(acc, schema1);
 
 			Schema schema2 = Repository.buildSampleSchema2("Sales");
 			schema2.translate();

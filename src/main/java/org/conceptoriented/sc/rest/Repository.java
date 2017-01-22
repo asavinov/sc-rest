@@ -33,8 +33,8 @@ public class Repository  {
 	protected String udfDir; 
 	protected File classDir;
 	
-	protected Duration accountTimeout = Duration.ofMinutes(1); // Maximum time after being accessed
-	protected Duration accountAge = Duration.ofDays(1); // Maximum time after being created
+	protected Duration accountTimeout = Duration.ofHours(3); // Maximum inactivity time after last access
+	protected Duration accountAge = Duration.ofHours(12); // Maximum existence time after being created
 	protected Instant lastCheck = Instant.now();
 
 	public void pruneAccounts() { // Delete all expired accounts
@@ -265,15 +265,21 @@ public class Repository  {
 
 	public static Schema buildSampleSchema2(String name) {
 		if(name == null || name.isEmpty()) name = "Sales";
-
+		
 		Schema schema = new Schema(name);
+
+		String path = "src/test/resources/example1";
+		if (!new File(path).exists())
+			path = "samples/example1";
+		if(!new File(path).exists())
+			return schema;
 
 		// Tables
 
-		String path1 = "src/test/resources/example1/OrderItems.csv";
+		String path1 = path + "/OrderItems.csv";
         Table table1 = schema.createFromCsv(path1, true);
 
-        String path2 = "src/test/resources/example1/Products.csv";
+        String path2 = path + "/Products.csv";
         Table table2 = schema.createFromCsv(path2, true);
 
         Table table3 = schema.createTable("Orders");

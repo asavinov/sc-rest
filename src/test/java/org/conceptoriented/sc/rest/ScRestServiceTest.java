@@ -32,7 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import org.conceptoriented.sc.core.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes=Application.class)
 //@ActiveProfiles("Win")
 public class ScRestServiceTest {
 
