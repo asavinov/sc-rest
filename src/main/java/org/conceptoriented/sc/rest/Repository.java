@@ -288,18 +288,22 @@ public class Repository  {
 		// Columns
 
         Column c11 = schema.createColumn("Product", "OrderItems", "Products");
+        c11.setKind(DcColumnKind.LINK);
 		c11.setFormula("{ [ID] = [Product ID] }");
         Column c12 = schema.createColumn("Order", "OrderItems", "Orders");
+        c12.setKind(DcColumnKind.LINK);
 		c12.setFormula("{ [ID] = [Order ID] }");
 
 		Column c;
 		c = schema.createColumn("Total Amount", "Products", "Double");
+        c.setKind(DcColumnKind.ACCU);
 		c.setFormula("0.0");
 		c.setAccuformula("out + [Quantity] * [Unit Price]");
 		c.setAccutable("OrderItems");
 		c.setAccupath("[Product]");
 
 		c = schema.createColumn("Total Amount", "Orders", "Double");
+        c.setKind(DcColumnKind.ACCU);
 		c.setFormula("0.0");
 		c.setAccuformula("out + [Quantity] * [Unit Price]");
 		c.setAccutable("OrderItems");
