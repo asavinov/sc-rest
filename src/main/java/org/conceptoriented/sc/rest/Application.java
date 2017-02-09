@@ -46,8 +46,8 @@ public class Application {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Application.class.getName());
 
-	// Default list of allowed hosts
-	public static String origins = "http://localhost,http://localhost:8080,http://dc.conceptoriented.com,http://conceptoriented.com,http://datacommandr.eastus2.cloudapp.azure.com";
+	// Default list of allowed hosts. Use * for all origins.
+	public static String origins = "*,http://localhost,http://localhost:8080,http://dc.conceptoriented.com,http://conceptoriented.com,http://datacommandr.eastus2.cloudapp.azure.com";
 
 	public static void main(String[] args) {
 		SpringApplication app = new SpringApplication(Application.class);
