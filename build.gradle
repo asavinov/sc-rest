@@ -1,10 +1,13 @@
 buildscript {
     repositories {
+        flatDir {
+            dirs "$rootProject.projectDir"
+        }
 		mavenLocal()
 		mavenCentral()
 	}
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.1.RELEASE")
     }
 }
 
@@ -12,9 +15,15 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
 
+task webjar(type: Jar, dependsOn: "jar") { 
+    from(fileTree("../sc-web/dist")) {  
+        into "META-INF/resources" 
+    } 
+}
+
 jar {
     baseName = 'sc-rest'
-    version =  '0.3.0'
+    version =  '0.4.0'
 }
 
 repositories {
@@ -27,16 +36,16 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'org.conceptoriented.sc'
-version = 0.3
+version = 0.4
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")	
-    compile("org.conceptoriented:sc-core:0.3.0")
+    compile("org.conceptoriented:sc-core:0.4.0")
 
 	testCompile("org.springframework.boot:spring-boot-starter-test")
-    testCompile("org.conceptoriented:sc-core:0.3.0")
+    testCompile("org.conceptoriented:sc-core:0.4.0")
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.3'
+    gradleVersion = '3.3'
 }
