@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.conceptoriented.sc.core.*;
 
 @Service
@@ -76,34 +77,34 @@ public class Repository  {
 	
 	public Account getAccount(UUID id) {
 		pruneAccounts();
-		Optional<Account> ret = accounts
-				.stream()
-				.filter(acc -> acc.getId().equals(id))
-				.findAny();
-        if(!ret.isPresent()) return null;
-        Account acc = ret.get();
+		Account acc = accounts
+			.stream()
+			.filter(x -> x.getId().equals(id))
+			.findAny()
+			.orElse(null);
+		if(acc == null) return null;
         acc.setAccessed();
     	return acc;
 	}
 	public Account getAccountForName(String name) { // An account must have unique name
 		pruneAccounts();
-		Optional<Account> ret = accounts
-				.stream()
-				.filter(x -> x.getName().equals(name))
-				.findAny();
-        if(!ret.isPresent()) return null;
-        Account acc = ret.get();
+		Account acc = accounts
+			.stream()
+			.filter(x -> x.getName().equalsIgnoreCase(name))
+			.findAny()
+			.orElse(null);
+		if(acc == null) return null;
         acc.setAccessed();
     	return acc;
 	}
 	public Account getAccountForSession(HttpSession session) { // Find an account associated with this session
 		pruneAccounts();
-		Optional<Account> ret = accounts
+		Account acc = accounts
 				.stream()
 				.filter(x -> x.getSession().equals(session.getId()))
-				.findAny();
-        if(!ret.isPresent()) return null;
-        Account acc = ret.get();
+				.findAny()
+				.orElse(null);
+        if(acc == null) return null;
         acc.setAccessed();
     	return acc;
 	}
@@ -113,44 +114,45 @@ public class Repository  {
 	}
 
 	//
-	// All existing schemas belonging to different users
+	// All existing schemas belonging to different accounts
 	//
-	protected Map<Schema, Account> schemas = new HashMap<Schema, Account>();
+	protected List<Schema> schemas = new ArrayList<Schema>();
+
+	protected List<Pair<Schema, Account>> saRelationship = new ArrayList<Pair<Schema, Account>>();
 
 	public Schema getSchema(UUID id) {
-		Optional<Schema> ret = schemas.keySet()
-				.stream()
-				.filter(key -> key.getId().equals(id))
-				.findAny();
-        if(ret.isPresent()) return ret.get();
-        else return null;
+		return schemas
+			.stream()
+			.filter(x -> x.getId().equals(id))
+			.findAny()
+			.orElse(null);
 	}
 	public Schema getSchemaForName(UUID id, String name) {
-		Optional<Schema> ret = getSchemasForAccount(id)
-				.stream()
-				.filter(x -> x.getName().equals(name))
-				.findAny();
-        if(ret.isPresent()) return ret.get();
-        else return null;
+		return getSchemasForAccount(id)
+			.stream()
+			.filter(x -> x.getName().equalsIgnoreCase(name))
+			.findAny()
+			.orElse(null);
 	}
 	public List<Schema> getSchemasForAccount(UUID id) {
-		List<Schema> ret = schemas.entrySet()
-				.stream()
-				.filter(entry -> entry.getValue().getId().equals(id))
-				.map(Map.Entry::getKey)
-				.collect(Collectors.<Schema>toList());
-		return ret;
+		return saRelationship
+			.stream()
+			.filter(x -> x.getRight().getId().equals(id))
+			.map(x -> x.getLeft())
+			.collect(Collectors.<Schema>toList());
 	}
 	public Schema addSchema(Account account, Schema schema) {
 		if(account.getClassLoader() != null) {
 			// Schema will use its account loader which knows how to load classes from this account assets
 			schema.setClassLoader(account.getClassLoader());
 		}
-		schemas.put(schema, account);
+		schemas.add(schema);
+		saRelationship.add(Pair.of(schema, account));
 		return schema;
 	}
 	public void deleteSchema(Schema schema) {
 		schemas.remove(schema);
+		saRelationship.removeIf(x -> x.getLeft().getId().equals(schema.getId()));
 	}
 
 	public Table getTable(UUID accId, UUID id) {
@@ -175,20 +177,18 @@ public class Repository  {
 	protected Map<Asset, Account> assets = new HashMap<Asset, Account>();
 
 	public Asset getAsset(UUID id) {
-		Optional<Asset> ret = assets.keySet()
-				.stream()
-				.filter(key -> key.getId().equals(id))
-				.findAny();
-        if(ret.isPresent()) return ret.get();
-        else return null;
+		return assets.keySet()
+			.stream()
+			.filter(key -> key.getId().equals(id))
+			.findAny()
+			.orElse(null);
 	}
 	public List<Asset> getAssetsForAccount(UUID id) {
-		List<Asset> ret = assets.entrySet()
+		return assets.entrySet()
 				.stream()
 				.filter(entry -> entry.getValue().getId().equals(id))
 				.map(Map.Entry::getKey)
 				.collect(Collectors.<Asset>toList());
-		return ret;
 	}
 	public Asset addAsset(Account account, Asset asset) {
 		assets.put(asset, account);
