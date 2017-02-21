@@ -131,7 +131,7 @@ public class ScRestService {
 			acc.schemaCreateCount++;
 		}
 		catch(DcError e) {
-			LOG.error("DcError",  e);
+			LOG.error("Error code: {}. Message: {}. Description: {}.", e.code,  e.message, e.description);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
@@ -177,7 +177,7 @@ public class ScRestService {
 			acc.schemaUpdateCount++;
 		}
 		catch(DcError e) {
-			LOG.error("DcError",  e);
+			LOG.error("Error code: {}. Message: {}. Description: {}.", e.code,  e.message, e.description);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
@@ -250,7 +250,7 @@ public class ScRestService {
 			acc.tableCreateCount++;
 		}
 		catch(DcError e) {
-			LOG.error("DcError",  e);
+			LOG.error("Error code: {}. Message: {}. Description: {}.", e.code,  e.message, e.description);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
@@ -302,7 +302,7 @@ public class ScRestService {
 			acc.columnCreateCount++;
 		}
 		catch(DcError e) {
-			LOG.error("DcError",  e);
+			LOG.error("Error code: {}. Message: {}. Description: {}.", e.code,  e.message, e.description);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
@@ -396,7 +396,7 @@ public class ScRestService {
 			acc.tableUpdateCount++;
 		}
 		catch(DcError e) {
-			LOG.error("DcError",  e);
+			LOG.error("Error code: {}. Message: {}. Description: {}.", e.code,  e.message, e.description);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
@@ -589,7 +589,7 @@ public class ScRestService {
 			acc.columnUpdateCount++;
 		}
 		catch(DcError e) {
-			LOG.error("DcError",  e);
+			LOG.error("Error code: {}. Message: {}. Description: {}.", e.code,  e.message, e.description);
 			return ResponseEntity.ok(e.toJson());
 		}
 		catch(Exception e) {
