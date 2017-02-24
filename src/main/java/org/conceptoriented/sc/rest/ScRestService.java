@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import org.conceptoriented.sc.core.*;
+import org.json.JSONObject;
 
 @RestController
 @RequestMapping("/api")
@@ -517,8 +518,14 @@ public class ScRestService {
 		if(table == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Table not found.", ""));
 
 		try {
-			List<Record> records = Record.fromCsvList(body);
-			table.append(records, null);
+			// Split parameters in the first line and data in the rest of the file
+			// First line of the body is json object with parameters
+			// Parameters are followed by one optional header line which is followed by many value lines
+			int paramsEnd = body.indexOf("\n");
+			String params = body.substring(0, paramsEnd).trim();
+			String lines = body.substring(paramsEnd+1, body.length());
+
+			table.getSchema().createFromCsvLines(table.getName(), lines, params);
 			acc.tableUploadCount++;
 		}
 		catch(Exception e) {

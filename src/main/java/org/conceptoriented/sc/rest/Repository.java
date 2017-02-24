@@ -213,14 +213,14 @@ public class Repository  {
 
 		// Columns
 		Column c;
-		c = schema.createColumn("A", "My Table", "Double");
-		c = schema.createColumn("B", "My Table", "Double");
+		c = schema.createColumn("My Table", "A", "Double");
+		c = schema.createColumn("My Table", "B", "Double");
 		c.setFormula("[A] + 1.0");
-		c = schema.createColumn("C", "My Table", "Double");
+		c = schema.createColumn("My Table", "C", "Double");
 		c.setFormula("[A] + [B]");
         //String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
 		//c13.setDescriptor(d13.replace('`', '"'));
-		c = schema.createColumn("AA", "My Table", "Double");
+		c = schema.createColumn("My Table", "AA", "Double");
 		c.setFormula("[A]");
 		c.setAccuformula("out + [E] * 10.0");
 		c.setAccutable("My Table 2");
@@ -245,10 +245,10 @@ public class Repository  {
 		t2.setMaxLength(20);
 
 		// Columns
-		Column c21 = schema.createColumn("D", "My Table 2", "Double");
-		Column c22 = schema.createColumn("E", "My Table 2", "Double");
+		Column c21 = schema.createColumn("My Table 2", "D", "Double");
+		Column c22 = schema.createColumn("My Table 2", "E", "Double");
 		c22.setFormula("[D] * 2.0");
-		Column c23 = schema.createColumn("GG", "My Table 2", "My Table");
+		Column c23 = schema.createColumn("My Table 2", "GG", "My Table");
 		c23.setFormula("{ [A]=[D] }");
 		
 		// Data
@@ -277,32 +277,32 @@ public class Repository  {
 		// Tables
 
 		String path1 = path + "/OrderItems.csv";
-        Table table1 = schema.createFromCsv(path1, true);
+        Table table1 = schema.createFromCsvFile(path1, true);
 
         String path2 = path + "/Products.csv";
-        Table table2 = schema.createFromCsv(path2, true);
+        Table table2 = schema.createFromCsvFile(path2, true);
 
         Table table3 = schema.createTable("Orders");
-        schema.createColumn("ID", "Orders", "Double");
+        schema.createColumn("Orders", "ID", "Double");
 
 		// Columns
 
-        Column c11 = schema.createColumn("Product", "OrderItems", "Products");
+        Column c11 = schema.createColumn("OrderItems", "Product", "Products");
         c11.setKind(DcColumnKind.LINK);
 		c11.setFormula("{ [ID] = [Product ID] }");
-        Column c12 = schema.createColumn("Order", "OrderItems", "Orders");
+        Column c12 = schema.createColumn("OrderItems", "Order", "Orders");
         c12.setKind(DcColumnKind.LINK);
 		c12.setFormula("{ [ID] = [Order ID] }");
 
 		Column c;
-		c = schema.createColumn("Total Amount", "Products", "Double");
+		c = schema.createColumn("Products", "Total Amount", "Double");
         c.setKind(DcColumnKind.ACCU);
 		c.setFormula("0.0");
 		c.setAccuformula("out + [Quantity] * [Unit Price]");
 		c.setAccutable("OrderItems");
 		c.setAccupath("[Product]");
 
-		c = schema.createColumn("Total Amount", "Orders", "Double");
+		c = schema.createColumn("Orders", "Total Amount", "Double");
         c.setKind(DcColumnKind.ACCU);
 		c.setFormula("0.0");
 		c.setAccuformula("out + [Quantity] * [Unit Price]");
