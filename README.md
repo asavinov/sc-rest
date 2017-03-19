@@ -21,6 +21,7 @@ The following steps have to be performed:
 
 A list of changes for each release can be found in the UI project.
 
+* v0.5.0 (2017-03-19)
 * v0.4.0 (2017-02-12)
 * v0.3.0 (2017-01-22)
 * v0.2.0 (2016-12-10)
