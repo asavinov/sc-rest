@@ -78,7 +78,7 @@ public class ScRestService {
 			acc = new Account(repository, "test@host.com");
 			acc.setSession(session.getId());
 			repository.addAccount(acc);
-			LOG.info("Method: {}, ACCOUNT CREATED. Account: {}", "GET/login", acc.getId());
+			LOG.info("Method: {}, ACCOUNT CREATED. Account: {}", "GET/account", acc.getId());
 
 			//Schema schema1 = Repository.buildSampleSchema1("My Schema");
 			//schema1.translate();
@@ -448,7 +448,7 @@ public class ScRestService {
 		Range range = null; // All records
 		String data = "";
 		for(Record record : table.read(range)) {
-			String data_elem = record.toJson();
+			String data_elem = record.toJsonMap();
 			data += data_elem + ", ";
 		}
 		if(data.length() > 2) {
