@@ -41,10 +41,10 @@ public class Repository  {
 	public void pruneAccounts() { // Delete all expired accounts
 
 		Instant now = Instant.now();
-		if(Duration.between(lastCheck, now).getSeconds() < 10) return; // Do not prune too frequently
+		if(Duration.between(this.lastCheck, now).getSeconds() < 10) return; // Do not prune too frequently
 		List<Account> toDelete = new ArrayList<Account>();
-		for(Account acc : accounts) {
-			if(Duration.between(acc.getAccessTime(), now).getSeconds() > accountTimeout.getSeconds()) { // Not accessed long time
+		for(Account acc : this.accounts) {
+			if(Duration.between(acc.getAccessTime(), now).getSeconds() > this.accountTimeout.getSeconds()) { // Not accessed long time
 				acc.setDeleted();
 				toDelete.add(acc);
 			}
@@ -65,7 +65,7 @@ public class Repository  {
 			;
 		} finally {
 			for(Account acc : toDelete) {
-				accounts.remove(acc);
+				this.accounts.remove(acc);
 			}
 		}
 	}
@@ -77,7 +77,7 @@ public class Repository  {
 	
 	public Account getAccount(UUID id) {
 		pruneAccounts();
-		Account acc = accounts
+		Account acc = this.accounts
 			.stream()
 			.filter(x -> x.getId().equals(id))
 			.findAny()
@@ -88,7 +88,7 @@ public class Repository  {
 	}
 	public Account getAccountForName(String name) { // An account must have unique name
 		pruneAccounts();
-		Account acc = accounts
+		Account acc = this.accounts
 			.stream()
 			.filter(x -> x.getName().equalsIgnoreCase(name))
 			.findAny()
@@ -99,7 +99,7 @@ public class Repository  {
 	}
 	public Account getAccountForSession(HttpSession session) { // Find an account associated with this session
 		pruneAccounts();
-		Account acc = accounts
+		Account acc = this.accounts
 				.stream()
 				.filter(x -> x.getSession().equals(session.getId()))
 				.findAny()
@@ -109,7 +109,7 @@ public class Repository  {
     	return acc;
 	}
 	public Account addAccount(Account account) {
-		accounts.add(account);
+		this.accounts.add(account);
 		return account;
 	}
 
@@ -121,7 +121,7 @@ public class Repository  {
 	protected List<Pair<Schema, Account>> saRelationship = new ArrayList<Pair<Schema, Account>>();
 
 	public Schema getSchema(UUID id) {
-		return schemas
+		return this.schemas
 			.stream()
 			.filter(x -> x.getId().equals(id))
 			.findAny()
@@ -135,7 +135,7 @@ public class Repository  {
 			.orElse(null);
 	}
 	public List<Schema> getSchemasForAccount(UUID id) {
-		return saRelationship
+		return this.saRelationship
 			.stream()
 			.filter(x -> x.getRight().getId().equals(id))
 			.map(x -> x.getLeft())
@@ -146,13 +146,13 @@ public class Repository  {
 			// Schema will use its account loader which knows how to load classes from this account assets
 			schema.setClassLoader(account.getClassLoader());
 		}
-		schemas.add(schema);
-		saRelationship.add(Pair.of(schema, account));
+		this.schemas.add(schema);
+		this.saRelationship.add(Pair.of(schema, account));
 		return schema;
 	}
 	public void deleteSchema(Schema schema) {
-		schemas.remove(schema);
-		saRelationship.removeIf(x -> x.getLeft().getId().equals(schema.getId()));
+		this.schemas.remove(schema);
+		this.saRelationship.removeIf(x -> x.getLeft().getId().equals(schema.getId()));
 	}
 
 	public Table getTable(UUID accId, UUID id) {
@@ -177,21 +177,21 @@ public class Repository  {
 	protected Map<Asset, Account> assets = new HashMap<Asset, Account>();
 
 	public Asset getAsset(UUID id) {
-		return assets.keySet()
+		return this.assets.keySet()
 			.stream()
 			.filter(key -> key.getId().equals(id))
 			.findAny()
 			.orElse(null);
 	}
 	public List<Asset> getAssetsForAccount(UUID id) {
-		return assets.entrySet()
+		return this.assets.entrySet()
 				.stream()
 				.filter(entry -> entry.getValue().getId().equals(id))
 				.map(Map.Entry::getKey)
 				.collect(Collectors.<Asset>toList());
 	}
 	public Asset addAsset(Account account, Asset asset) {
-		assets.put(asset, account);
+		this.assets.put(asset, account);
 		return asset;
 	}
 
@@ -382,7 +382,7 @@ class Account {
 	private Repository repository;
 
 	public List<Asset> getAssets(String extension) {
-		return repository.getAssetsForAccount(this.getId());
+		return this.repository.getAssetsForAccount(this.getId());
 	}
 	
 	//
