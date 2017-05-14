@@ -1,11 +1,11 @@
-# DataCommandr REST Service
+# Stream Commandr REST Service
 
-This service exposes functionality of the DataCommandr engine as a HTTP REST service.
+This service exposes functionality of the Stream Commandr engine as a HTTP REST service.
 
 # Build
 
 The following steps have to be performed: 
-* Build the project with the DataCommandr core library.
+* Build the project with the Stream Commandr core library.
 * Set the necessary parameters either in application.properties or in start.bat:
   * log file and log level
   * session timeout and age
@@ -21,7 +21,7 @@ The following steps have to be performed:
 
 A list of changes for each release can be found in the UI project.
 
-* v0.6.0 (2017-04-xx)
+* v0.6.0 (2017-05-14)
 * v0.5.0 (2017-03-19)
 * v0.4.0 (2017-02-12)
 * v0.3.0 (2017-01-22)
