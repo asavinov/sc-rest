@@ -13,7 +13,7 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
 
 task webjar(type: Jar, dependsOn: "jar") { 
     from(fileTree("../sc-web/dist")) {  
@@ -36,16 +36,16 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'org.conceptoriented.sc'
-version = 0.6
+version = '0.6.0'
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")	
-    compile("org.conceptoriented:sc-core:0.6.0")
+    compile("org.conceptoriented.sc:sc-core:0.6.0")
 
 	testCompile("org.springframework.boot:spring-boot-starter-test")
-    testCompile("org.conceptoriented:sc-core:0.6.0")
+    testCompile("org.conceptoriented.sc:sc-core:0.6.0")
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.3'
+    gradleVersion = '3.5'
 }
