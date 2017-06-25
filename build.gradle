@@ -23,7 +23,7 @@ task webjar(type: Jar, dependsOn: "jar") {
 
 jar {
     baseName = 'sc-rest'
-    version =  '0.6.0'
+    version =  '0.7.0'
 }
 
 repositories {
@@ -36,14 +36,14 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'org.conceptoriented.sc'
-version = '0.6.0'
+version = '0.7.0'
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")	
-    compile("org.conceptoriented.sc:sc-core:0.6.0")
+    compile("org.conceptoriented.sc:sc-core:0.7.0")
 
 	testCompile("org.springframework.boot:spring-boot-starter-test")
-    testCompile("org.conceptoriented.sc:sc-core:0.6.0")
+    testCompile("org.conceptoriented.sc:sc-core:0.7.0")
 }
 
 task wrapper(type: Wrapper) {

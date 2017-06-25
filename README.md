@@ -14,13 +14,30 @@ The following steps have to be performed:
 
 # Deploy and Run
 
-* In the firewall, open the port on the server where this service will run (Windows or Linux)
-* Start web server by using the file in build/libs: java -jar sc-rest-0.2.0.jar
+* In the firewall, open the port on the server where this service will run.
+  * Windows Server. Go to Server Manager, Menu Tools, Windows Firewall and Advanced Security, Inbound Rules.
+  * Linux.
+  * Azure. Go to Azure Portal and open Network Security Group (NSG) node used by VM. Open ports in Inbound Rules section. 
+* Install necessary software:
+  * Linux:
+    * sudo apt-get update
+    * sudo apt-get install default-jre
+    * sudo apt-get install nginx
+* Copy:    
+  * Linux:
+    * /var/www/html - application
+    * /etc/nginx/sites-available/default - nginx configuration with default html files
+* Start services:    
+  * Linux:
+    * sudo service nginx [start|stop|restart|status]
+    * nohup java -jar /web/server.jar &
+    * ps -ef | grep  server
 
 # Change Log
 
 A list of changes for each release can be found in the UI project.
 
+* v0.7.0 (2017-06-xx)
 * v0.6.0 (2017-05-14)
 * v0.5.0 (2017-03-19)
 * v0.4.0 (2017-02-12)
