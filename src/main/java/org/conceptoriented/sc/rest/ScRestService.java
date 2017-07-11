@@ -349,7 +349,7 @@ public class ScRestService {
 		if(schema == null) return ResponseEntity.ok(DcError.error(DcErrorCode.GENERAL, "Schema not found.", ""));
 
 		try {
-			schema.getTables().forEach(x -> x.markCleanAsNew()); // Mark all columns in the schema as new (dirty, non-evaluated)
+			schema.getColumns().forEach(x -> x.isChanged = true); // Mark all columns in the schema as new (dirty, non-evaluated)
 			schema.translate();
 			schema.evaluate(); // Evaluate
 			acc.schemaEvaluateCount++;
