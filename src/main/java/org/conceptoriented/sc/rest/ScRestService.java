@@ -326,7 +326,8 @@ public class ScRestService {
 
 		String jelems = "";
 		for(Column elem : schema.getColumns()) {
-			String jelem = elem.getStatus().toJson();
+			DcError error = elem.getThisOrDependenceError();
+			String jelem = error != null ? error.toJson() : "undefined";
 			jelems += "\"" + elem.getId() + "\"" + ": " + jelem + ", ";
 		}
 		if(jelems.length() > 2) {

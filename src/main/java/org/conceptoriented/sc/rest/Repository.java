@@ -215,16 +215,19 @@ public class Repository  {
 		Column c;
 		c = schema.createColumn("My Table", "A", "Double");
 		c = schema.createColumn("My Table", "B", "Double");
-		c.setFormula("[A] + 1.0");
+		c.setKind(DcColumnKind.CALC);
+		c.setCalcFormula("[A] + 1.0");
 		c = schema.createColumn("My Table", "C", "Double");
-		c.setFormula("[A] + [B]");
+		c.setKind(DcColumnKind.CALC);
+		c.setCalcFormula("[A] + [B]");
         //String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
 		//c13.setDescriptor(d13.replace('`', '"'));
 		c = schema.createColumn("My Table", "AA", "Double");
-		c.setFormula("[A]");
-		c.setAccuformula("out + [E] * 10.0");
-		c.setAccutable("My Table 2");
-		c.setAccupath("[GG]");
+		c.setKind(DcColumnKind.ACCU);
+		c.setInitFormula("[A]");
+		c.setAccuFormula("[out] + [E] * 10.0");
+		c.setAccuTable("My Table 2");
+		c.setAccuPath("[GG]");
 		
 		// Data
         Record r = new Record();
@@ -247,9 +250,11 @@ public class Repository  {
 		// Columns
 		Column c21 = schema.createColumn("My Table 2", "D", "Double");
 		Column c22 = schema.createColumn("My Table 2", "E", "Double");
-		c22.setFormula("[D] * 2.0");
+		c22.setKind(DcColumnKind.CALC);
+		c22.setCalcFormula("[D] * 2.0");
 		Column c23 = schema.createColumn("My Table 2", "GG", "My Table");
-		c23.setFormula("{ [A]=[D] }");
+		c23.setKind(DcColumnKind.LINK);
+		c23.setLinkFormula("{ [A]=[D] }");
 		
 		// Data
         r = new Record();
@@ -289,25 +294,25 @@ public class Repository  {
 
         Column c11 = schema.createColumn("OrderItems", "Product", "Products");
         c11.setKind(DcColumnKind.LINK);
-		c11.setFormula("{ [ID] = [Product ID] }");
+		c11.setLinkFormula("{ [ID] = [Product ID] }");
         Column c12 = schema.createColumn("OrderItems", "Order", "Orders");
         c12.setKind(DcColumnKind.LINK);
-		c12.setFormula("{ [ID] = [Order ID] }");
+		c12.setLinkFormula("{ [ID] = [Order ID] }");
 
 		Column c;
 		c = schema.createColumn("Products", "Total Amount", "Double");
         c.setKind(DcColumnKind.ACCU);
-		c.setFormula("0.0");
-		c.setAccuformula("out + [Quantity] * [Unit Price]");
-		c.setAccutable("OrderItems");
-		c.setAccupath("[Product]");
+		c.setInitFormula("0.0");
+		c.setAccuFormula("[out] + [Quantity] * [Unit Price]");
+		c.setAccuTable("OrderItems");
+		c.setAccuPath("[Product]");
 
 		c = schema.createColumn("Orders", "Total Amount", "Double");
         c.setKind(DcColumnKind.ACCU);
-		c.setFormula("0.0");
-		c.setAccuformula("out + [Quantity] * [Unit Price]");
-		c.setAccutable("OrderItems");
-		c.setAccupath("[Order]");
+		c.setInitFormula("0.0");
+		c.setAccuFormula("[out] + [Quantity] * [Unit Price]");
+		c.setAccuTable("OrderItems");
+		c.setAccuPath("[Order]");
 
 		return schema;
 	}
