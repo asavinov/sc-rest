@@ -211,25 +211,27 @@ public class Repository  {
 		Table t1 = schema.createTable("My Table");
 		t1.setMaxLength(10);
 
+		//
 		// Columns
+		//
 		Column c;
 		c = schema.createColumn("My Table", "A", "Double");
+
 		c = schema.createColumn("My Table", "B", "Double");
 		c.setKind(DcColumnKind.CALC);
-		c.setCalcFormula("[A] + 1.0");
+        c.setDefinitionCalc(new ColumnDefinitionCalc("[A] + 1.0", ColumnDefinitionKind.EXP4J));
+
 		c = schema.createColumn("My Table", "C", "Double");
 		c.setKind(DcColumnKind.CALC);
-		c.setCalcFormula("[A] + [B]");
-        //String d13 = "{ `class`:`org.conceptoriented.sc.core.SUM`, `dependencies`:[`A`,`B`] }";
-		//c13.setDescriptor(d13.replace('`', '"'));
+        c.setDefinitionCalc(new ColumnDefinitionCalc("[A] + [B]", ColumnDefinitionKind.EXP4J));
+
 		c = schema.createColumn("My Table", "AA", "Double");
 		c.setKind(DcColumnKind.ACCU);
-		c.setInitFormula("[A]");
-		c.setAccuFormula("[out] + [E] * 10.0");
-		c.setAccuTable("My Table 2");
-		c.setAccuPath("[GG]");
+        c.setDefinitionAccu(new ColumnDefinitionAccu("[A]", "[out] + [E] * 10.0", null, "My Table 2", "[GG]", ColumnDefinitionKind.EXP4J));
 		
+		//
 		// Data
+		//
         Record r = new Record();
 
         r.set("A", 11.11); r.set("B", 22.22);
@@ -251,10 +253,11 @@ public class Repository  {
 		Column c21 = schema.createColumn("My Table 2", "D", "Double");
 		Column c22 = schema.createColumn("My Table 2", "E", "Double");
 		c22.setKind(DcColumnKind.CALC);
-		c22.setCalcFormula("[D] * 2.0");
+		c22.setDefinitionCalc(new ColumnDefinitionCalc("[D] * 2.0", ColumnDefinitionKind.EXP4J));
+
 		Column c23 = schema.createColumn("My Table 2", "GG", "My Table");
 		c23.setKind(DcColumnKind.LINK);
-		c23.setLinkFormula("{ [A]=[D] }");
+		c23.setDefinitionLink(new ColumnDefinitionLink("{ [A]=[D] }", ColumnDefinitionKind.EXP4J));
 		
 		// Data
         r = new Record();
@@ -279,7 +282,9 @@ public class Repository  {
 		if(!new File(path).exists())
 			return schema;
 
+		//
 		// Tables
+		//
 
 		String path1 = path + "/OrderItems.csv";
         Table table1 = schema.createFromCsvFile(path1, true);
@@ -290,29 +295,26 @@ public class Repository  {
         Table table3 = schema.createTable("Orders");
         schema.createColumn("Orders", "ID", "Double");
 
+        //
 		// Columns
+        //
 
         Column c11 = schema.createColumn("OrderItems", "Product", "Products");
         c11.setKind(DcColumnKind.LINK);
-		c11.setLinkFormula("{ [ID] = [Product ID] }");
-        Column c12 = schema.createColumn("OrderItems", "Order", "Orders");
+        c11.setDefinitionLink(new ColumnDefinitionLink("{ [ID] = [Product ID] }", ColumnDefinitionKind.EXP4J));
+
+		Column c12 = schema.createColumn("OrderItems", "Order", "Orders");
         c12.setKind(DcColumnKind.LINK);
-		c12.setLinkFormula("{ [ID] = [Order ID] }");
+        c12.setDefinitionLink(new ColumnDefinitionLink("{ [ID] = [Order ID] }", ColumnDefinitionKind.EXP4J));
 
 		Column c;
 		c = schema.createColumn("Products", "Total Amount", "Double");
         c.setKind(DcColumnKind.ACCU);
-		c.setInitFormula("0.0");
-		c.setAccuFormula("[out] + [Quantity] * [Unit Price]");
-		c.setAccuTable("OrderItems");
-		c.setAccuPath("[Product]");
+        c.setDefinitionAccu(new ColumnDefinitionAccu("0.0", "[out] + [Quantity] * [Unit Price]", null, "OrderItems", "[Product]", ColumnDefinitionKind.EXP4J));
 
 		c = schema.createColumn("Orders", "Total Amount", "Double");
         c.setKind(DcColumnKind.ACCU);
-		c.setInitFormula("0.0");
-		c.setAccuFormula("[out] + [Quantity] * [Unit Price]");
-		c.setAccuTable("OrderItems");
-		c.setAccuPath("[Order]");
+        c.setDefinitionAccu(new ColumnDefinitionAccu("0.0", "[out] + [Quantity] * [Unit Price]", null, "OrderItems", "[Order]", ColumnDefinitionKind.EXP4J));
 
 		return schema;
 	}

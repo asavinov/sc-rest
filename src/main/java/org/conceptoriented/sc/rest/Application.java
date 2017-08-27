@@ -54,7 +54,7 @@ public class Application {
 
 	public static void main(String[] args) {
 		SpringApplication app = new SpringApplication(Application.class);
-		setProfile(app);
+		//setProfile(app);
 		app.run(args);
 	}
 

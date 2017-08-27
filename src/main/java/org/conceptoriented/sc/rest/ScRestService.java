@@ -67,7 +67,9 @@ public class ScRestService {
 	//
 
 	@RequestMapping(value = "/account", method = RequestMethod.GET) // Get account object given credentials
-	public ResponseEntity<String> getAccount(HttpSession session) {
+	public ResponseEntity<String> getAccount(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+
 		//
 		// We need to get credentials (user id) and then find an account object for this user
 		//
@@ -78,7 +80,7 @@ public class ScRestService {
 			acc = new Account(repository, "test@host.com");
 			acc.setSession(session.getId());
 			repository.addAccount(acc);
-			LOG.info("Method: {}, ACCOUNT CREATED. Account: {}", "GET/account", acc.getId());
+			LOG.info("Method: {}, ACCOUNT CREATED. Account: {}, IP address: {}, Host: {}", "GET/account", acc.getId(), request.getRemoteAddr(), request.getRemoteHost());
 
 			//Schema schema1 = Repository.buildSampleSchema1("My Schema");
 			//schema1.translate();
