@@ -219,15 +219,15 @@ public class Repository  {
 
 		c = schema.createColumn("My Table", "B", "Double");
 		c.setKind(DcColumnKind.CALC);
-        c.setDefinitionCalc(new ColumnDefinitionCalc("[A] + 1.0", ColumnDefinitionKind.EXP4J));
+        c.setDefinitionCalc(new ColumnDefinitionCalc("[A] + 1.0", ExpressionKind.EXP4J));
 
 		c = schema.createColumn("My Table", "C", "Double");
 		c.setKind(DcColumnKind.CALC);
-        c.setDefinitionCalc(new ColumnDefinitionCalc("[A] + [B]", ColumnDefinitionKind.EXP4J));
+        c.setDefinitionCalc(new ColumnDefinitionCalc("[A] + [B]", ExpressionKind.EXP4J));
 
 		c = schema.createColumn("My Table", "AA", "Double");
 		c.setKind(DcColumnKind.ACCU);
-        c.setDefinitionAccu(new ColumnDefinitionAccu("[A]", "[out] + [E] * 10.0", null, "My Table 2", "[GG]", ColumnDefinitionKind.EXP4J));
+        c.setDefinitionAccu(new ColumnDefinitionAccu("[A]", "[out] + [E] * 10.0", null, "My Table 2", "[GG]", ExpressionKind.EXP4J));
 		
 		//
 		// Data
@@ -253,11 +253,11 @@ public class Repository  {
 		Column c21 = schema.createColumn("My Table 2", "D", "Double");
 		Column c22 = schema.createColumn("My Table 2", "E", "Double");
 		c22.setKind(DcColumnKind.CALC);
-		c22.setDefinitionCalc(new ColumnDefinitionCalc("[D] * 2.0", ColumnDefinitionKind.EXP4J));
+		c22.setDefinitionCalc(new ColumnDefinitionCalc("[D] * 2.0", ExpressionKind.EXP4J));
 
 		Column c23 = schema.createColumn("My Table 2", "GG", "My Table");
 		c23.setKind(DcColumnKind.LINK);
-		c23.setDefinitionLink(new ColumnDefinitionLink("{ [A]=[D] }", ColumnDefinitionKind.EXP4J));
+		c23.setDefinitionLink(new ColumnDefinitionLink("{ [A]=[D] }", ExpressionKind.EXP4J));
 		
 		// Data
         r = new Record();
@@ -301,20 +301,20 @@ public class Repository  {
 
         Column c11 = schema.createColumn("OrderItems", "Product", "Products");
         c11.setKind(DcColumnKind.LINK);
-        c11.setDefinitionLink(new ColumnDefinitionLink("{ [ID] = [Product ID] }", ColumnDefinitionKind.EXP4J));
+        c11.setDefinitionLink(new ColumnDefinitionLink("{ [ID] = [Product ID] }", ExpressionKind.EXP4J));
 
 		Column c12 = schema.createColumn("OrderItems", "Order", "Orders");
         c12.setKind(DcColumnKind.LINK);
-        c12.setDefinitionLink(new ColumnDefinitionLink("{ [ID] = [Order ID] }", ColumnDefinitionKind.EXP4J));
+        c12.setDefinitionLink(new ColumnDefinitionLink("{ [ID] = [Order ID] }", ExpressionKind.EXP4J));
 
 		Column c;
 		c = schema.createColumn("Products", "Total Amount", "Double");
         c.setKind(DcColumnKind.ACCU);
-        c.setDefinitionAccu(new ColumnDefinitionAccu("0.0", "[out] + [Quantity] * [Unit Price]", null, "OrderItems", "[Product]", ColumnDefinitionKind.EXP4J));
+        c.setDefinitionAccu(new ColumnDefinitionAccu("0.0", "[out] + [Quantity] * [Unit Price]", null, "OrderItems", "[Product]", ExpressionKind.EXP4J));
 
 		c = schema.createColumn("Orders", "Total Amount", "Double");
         c.setKind(DcColumnKind.ACCU);
-        c.setDefinitionAccu(new ColumnDefinitionAccu("0.0", "[out] + [Quantity] * [Unit Price]", null, "OrderItems", "[Order]", ColumnDefinitionKind.EXP4J));
+        c.setDefinitionAccu(new ColumnDefinitionAccu("0.0", "[out] + [Quantity] * [Unit Price]", null, "OrderItems", "[Order]", ExpressionKind.EXP4J));
 
 		return schema;
 	}

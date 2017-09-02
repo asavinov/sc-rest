@@ -1,1 +1,1 @@
-nohup java -jar sc-rest-0.6.0.jar --server.port=8000 --logging.level.org.conceptoriented.sc.rest=DEBUG --logging.file=dc.log --server.session.timeout=10800 &
+nohup java -jar sc-rest-0.7.0.jar --server.port=8000 --logging.level.org.conceptoriented.sc.rest=DEBUG --logging.file=dc.log --server.session.timeout=10800 &
